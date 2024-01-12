@@ -1,95 +1,86 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client' //TODO: Change this back to a Server Component after finished playing around
+
+import React, {FC, useState} from "react";
+import callServer from "@/util/frontend/callServer";
+import useEndpoint from "@/react/hooks/useEndpoint";
+import {DevPanel} from "@/react/components/DevPanel";
+import Link from "next/link";
+import {CreateGroupResponse, SimpleGroupResponse} from "@/magicRouter/routes/groupManagementRoutes";
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+    const usedBelongingGroups = useEndpoint<SimpleGroupResponse[]>({
+        config: {
+            url: '/api/groupManagement/listBelongingGroups'
+        }
+    })
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+    async function onLoginClicked() {
+        await callServer({
+            url: '/api/userAuth/login',
+            method: "POST"
+        })
+    }
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
+    async function onGetUserInfoClicked() {
+        const response = await callServer({
+            url: '/api/user/userInfo',
+        })
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+        alert(JSON.stringify(response.data))
+    }
+
+
+    return (
+        <main>
+            <h1>Valami</h1>
+
+            <button onClick={() => onLoginClicked()}>Login</button>
+            <button onClick={() => onGetUserInfoClicked()}>Get user info</button>
+            <br/>
+            <CreateGroupPanel afterNewGroupCreationSubmitted={() => usedBelongingGroups.reloadEndpoint()}/>
+
+            <h3>Groups:</h3>
+            {usedBelongingGroups.pending && (<p>Loading...</p>)}
+            {usedBelongingGroups.failed && (<p>Failed :/</p>)}
+            {usedBelongingGroups.succeeded && (
+                <ul>
+                    {usedBelongingGroups.data?.map(group => (
+                        <li key={group.id}><Link href={`/group/${group.id}`}>{group.name} ({group.id})</Link></li>
+                    ))}
+                </ul>
+            )}
+        </main>
+    )
+}
+
+
+interface CreateGroupPanelProps {
+    afterNewGroupCreationSubmitted?: () => void
+}
+
+const CreateGroupPanel: FC<CreateGroupPanelProps> = (props) => {
+    const [enteredName, setEnteredName] = useState<string>("")
+
+    function onSubmit() {
+        callServer<CreateGroupResponse>({
+            url: '/api/groupManagement/createGroup',
+            method: "POST",
+            data: {
+                groupName: enteredName,
+            }
+        })
+            .then(() => setEnteredName(""))
+            .finally(() => {
+                props.afterNewGroupCreationSubmitted?.()
+            })
+    }
+
+    return (<>
+        <DevPanel>
+            <input value={enteredName} onChange={e => setEnteredName(e.target.value)}/>
+            <button onClick={() => onSubmit()}>Create Group</button>
+        </DevPanel>
+    </>)
 }
