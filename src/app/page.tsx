@@ -6,6 +6,7 @@ import useEndpoint from "@/react/hooks/useEndpoint";
 import {DevPanel} from "@/react/components/DevPanel";
 import Link from "next/link";
 import {CreateGroupResponse, SimpleGroupResponse} from "@/magicRouter/routes/groupManagementRoutes";
+import {UsedEndpointSuspense} from "@/react/components/UsedEndpointSuspense";
 
 export default function Home() {
 
@@ -42,15 +43,13 @@ export default function Home() {
             <CreateGroupPanel afterNewGroupCreationSubmitted={() => usedBelongingGroups.reloadEndpoint()}/>
 
             <h3>Groups:</h3>
-            {usedBelongingGroups.pending && (<p>Loading...</p>)}
-            {usedBelongingGroups.failed && (<p>Failed :/</p>)}
-            {usedBelongingGroups.succeeded && (
+            <UsedEndpointSuspense usedEndpoint={usedBelongingGroups}>
                 <ul>
                     {usedBelongingGroups.data?.map(group => (
                         <li key={group.id}><Link href={`/group/${group.id}`}>{group.name} ({group.id})</Link></li>
                     ))}
                 </ul>
-            )}
+            </UsedEndpointSuspense>
         </main>
     )
 }

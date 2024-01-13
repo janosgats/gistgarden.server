@@ -1,4 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
+import {RouteNotFoundError} from '@/magicRouter/MagicRouter';
 
 
 type NextApiHandler = (req: NextRequest) => Promise<NextResponse>
@@ -16,10 +17,19 @@ export const withFilters = (toWrap: NextApiHandler): NextApiHandler => {
 
 
 async function handleCaughtError(req: NextRequest, error: unknown): Promise<NextResponse> {
+
+    console.log('error caught in api filter', error)
+
+    let statusCode = 500
+
+    if (error instanceof RouteNotFoundError) {
+        statusCode = 404
+    }
+
     return NextResponse.json({
         title: 'error caught in api filter',
-        errorMessage: (error as any)?.['message']
+        errorMessage: (error as any)?.['message'],
     }, {
-        status: 500
+        status: statusCode,
     })
 }

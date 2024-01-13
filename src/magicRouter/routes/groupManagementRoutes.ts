@@ -8,46 +8,6 @@ const PATH_PREFIX_GROUP_MANAGEMENT = '/api/groupManagement'
 
 export function setGroupManagementRoutes(magicRouter: MagicRouter) {
 
-    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/createTopicInGroup',
-        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
-            const loggedInUserId = await resolveLoggedInUserId()
-
-            await callUpstream({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
-                url: '/api/userFacingGroupManagement/createTopicInGroup',
-                method: "POST",
-                data: {
-                    initiatorUserId: loggedInUserId,
-                    groupId: request.body.groupId,
-                    topicDescription: request.body.topicDescription,
-                }
-            })
-
-            return {}
-        }
-    )
-
-
-    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/listTopicsInGroup',
-        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
-            const loggedInUserId = await resolveLoggedInUserId()
-
-            const upstreamResponse = await callUpstream<SimpleTopicResponse[]>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
-                url: '/api/userFacingGroupManagement/listTopicsInGroup',
-                method: 'POST',
-                data: {
-                    initiatorUserId: loggedInUserId,
-                    groupId: request.body.groupId,
-                }
-            })
-
-            return {
-                body: upstreamResponse.data
-            }
-        }
-    )
-
 
     magicRouter.setSimpleJsonHandler('GET', PATH_PREFIX_GROUP_MANAGEMENT + '/listBelongingGroups',
         async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
@@ -55,17 +15,17 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
 
             const upstreamResponse = await callUpstream<SimpleGroupResponse[]>({
                 baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
-                url: '/api/userFacingGroupManagement/listBelongingGroups',
+                url: '/api/userInitiated/groupManagement/listBelongingGroups',
                 params: {
-                    initiatorUserId: loggedInUserId
-                }
+                    initiatorUserId: loggedInUserId,
+                },
             })
 
             return {
-                body: upstreamResponse.data
+                body: upstreamResponse.data,
             }
         },
-        {skipReadingBody: true}
+        {skipReadingBody: true},
     )
 
 
@@ -75,18 +35,39 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
 
             const upstreamResponse = await callUpstream<CreateGroupResponse>({
                 baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
-                url: '/api/userFacingGroupManagement/createGroup',
+                url: '/api/userInitiated/groupManagement/createGroup',
                 method: "POST",
                 data: {
                     initiatorUserId: loggedInUserId,
                     groupName: request.body.groupName,
-                }
+                },
             })
 
             return {
-                body: upstreamResponse.data
+                body: upstreamResponse.data,
             }
-        }
+        },
+    )
+
+
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/getGroup',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            const upstreamResponse = await callUpstream<SimpleGroupResponse[]>({
+                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                url: '/api/userInitiated/groupManagement/getGroup',
+                method: 'POST',
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    groupId: request.body.groupId,
+                },
+            })
+
+            return {
+                body: upstreamResponse.data,
+            }
+        },
     )
 }
 

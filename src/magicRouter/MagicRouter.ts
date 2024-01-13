@@ -17,7 +17,7 @@ export interface SimpleJsonRequest {
 export interface SimpleJsonResponse {
     status?: number
     body?: any
-    headers?:HeadersInit
+    headers?: HeadersInit
 }
 
 export interface SetSimpleJsonHandlerSettings {
@@ -36,7 +36,7 @@ export class MagicRouter {
         method: HTTP_METHOD,
         path: string,
         handler: (request: SimpleJsonRequest) => Promise<SimpleJsonResponse>,
-        settings: SetSimpleJsonHandlerSettings = {}
+        settings: SetSimpleJsonHandlerSettings = {},
     ) {
         this.routeHandlers.push({
             endpointMatcher: (req: NextRequest) => {
@@ -73,10 +73,16 @@ export class MagicRouter {
         const matchedRouteHandler = this.routeHandlers.find(routeHandler => routeHandler.endpointMatcher(req))
 
         if (matchedRouteHandler === undefined) {
-            throw Error(`MagicRouter could not find a matching RouteHandler for ${req.method} ${req.nextUrl.pathname}`)
+            throw new RouteNotFoundError(`MagicRouter could not find a matching RouteHandler for ${req.method} ${req.nextUrl.pathname}`)
         }
 
         return await matchedRouteHandler.handle(req)
+    }
+}
+
+export class RouteNotFoundError extends Error {
+    constructor(message: string) {
+        super(message);
     }
 }
 
