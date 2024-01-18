@@ -1,6 +1,6 @@
 import axios, {AxiosPromise, AxiosRequestConfig} from 'axios';
-import {parseReceivedProblemRelayResponse} from '@/util/problemRelay/responseParser/HttpResponseParsers';
-import ReceivedProblemRelayError from '@/util/problemRelay/error/ReceivedProblemRelayError';
+import {parseReceivedProblemRelayResponse} from '@/util/both/problemRelay/responseParser/HttpResponseParsers';
+import ReceivedProblemRelayError from '@/util/both/problemRelay/error/ReceivedProblemRelayError';
 import ApiCallerResponseCodeIsNotSuccessError, {SerializableHttpResponse} from '@/error/ApiCallerResponseCodeIsNotSuccessError';
 
 const callServer = <ReturnType>(

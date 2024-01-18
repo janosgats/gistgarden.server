@@ -1,6 +1,6 @@
 import React, {FC, useState} from "react";
 import {SimpleTopicResponse} from "@/magicRouter/routes/groupManagementRoutes";
-import {CallStatus} from "@/util/CallStatus";
+import {CallStatus} from "@/util/both/CallStatus";
 import callServer from "@/util/frontend/callServer";
 
 interface Props {

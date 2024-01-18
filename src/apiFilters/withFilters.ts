@@ -1,10 +1,10 @@
 import {NextRequest, NextResponse} from "next/server";
 import {RouteNotFoundError} from '@/magicRouter/MagicRouter';
 import ApiCallerResponseCodeIsNotSuccessError from '@/error/ApiCallerResponseCodeIsNotSuccessError';
-import ProducedProblemRelayError from '@/util/problemRelay/error/ProducedProblemRelayError';
-import ReceivedProblemRelayError from '@/util/problemRelay/error/ReceivedProblemRelayError';
-import ProblemRelayResponseFactory from '@/util/problemRelay/responseFactory/ProblemRelayResponseFactory';
-import ProblemMarker from '@/util/problemRelay/model/ProblemMarker';
+import ProducedProblemRelayError from '@/util/both/problemRelay/error/ProducedProblemRelayError';
+import ReceivedProblemRelayError from '@/util/both/problemRelay/error/ReceivedProblemRelayError';
+import ProblemRelayResponseFactory from '@/util/both/problemRelay/responseFactory/ProblemRelayResponseFactory';
+import ProblemMarker from '@/util/both/problemRelay/model/ProblemMarker';
 
 
 type NextApiHandler = (req: NextRequest) => Promise<NextResponse>
