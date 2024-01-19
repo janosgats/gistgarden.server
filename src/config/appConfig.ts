@@ -4,13 +4,15 @@ export interface UpstreamApisConfig {
 
 export interface AppConfig {
     upstreamApis: UpstreamApisConfig
+    useSecureDirectiveWhenSettingJwtCookie: boolean
 }
 
 
 const devConfig: AppConfig = {
     upstreamApis: {
-        pointPulseWebserviceBaseUrl: 'http://localhost:3000'
-    }
+        pointPulseWebserviceBaseUrl: 'http://localhost:3000',
+    },
+    useSecureDirectiveWhenSettingJwtCookie: false,
 }
 
 

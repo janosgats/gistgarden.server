@@ -1,4 +1,4 @@
-'use client' //TODO: Change this back to a Server Component after finished playing around
+'use client'
 
 import React, {FC, useState} from "react";
 import callServer from "@/util/frontend/callServer";
@@ -7,20 +7,63 @@ import {DevPanel} from "@/react/components/DevPanel";
 import Link from "next/link";
 import {CreateGroupResponse, SimpleGroupResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {UsedEndpointSuspense} from "@/react/components/UsedEndpointSuspense";
+import {Avatar, Box, Button, Divider, List, ListItemAvatar, ListItemButton, ListItemText, Paper, Skeleton, Stack, Typography} from '@mui/material';
+import _ from 'lodash';
+import {Property} from 'csstype';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+
+function getFirstLettersOfWords(sentence: string): string {
+    if (!sentence) {
+        return 'N/A'
+    }
+    return sentence
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('');
+}
+
+const avatarColors: Property.Color[] = [
+    "red",
+    "green",
+    "blue",
+    "purple",
+    "orange",
+    "yellow",
+    "magenta",
+    "greenyellow",
+    "cyan",
+    "tomato",
+    "darkblue",
+    "brown",
+    "lime",
+    "gold",
+    "fuchsia",
+]
+
+const GroupLoadSkeleton = <Stack spacing={2} paddingTop={2}>
+    {_.times(6, (i) =>
+        <Skeleton key={i} variant="rectangular" height={56} animation="wave"/>,
+    )}
+</Stack>
+
+function getAvatarBackgroundColor(groupId: number): Property.Color {
+    const colorIndex = groupId % avatarColors.length
+    return avatarColors[colorIndex]
+}
 
 export default function Home() {
 
     const usedBelongingGroups = useEndpoint<SimpleGroupResponse[]>({
         config: {
-            url: '/api/groupManagement/listBelongingGroups'
-        }
+            url: '/api/groupManagement/listBelongingGroups',
+        },
     })
 
 
     async function onLoginClicked() {
         await callServer({
             url: '/api/userAuth/login',
-            method: "POST"
+            method: "POST",
         })
     }
 
@@ -37,19 +80,54 @@ export default function Home() {
         <main>
             <h1>Valami</h1>
 
-            <button onClick={() => onLoginClicked()}>Login</button>
-            <button onClick={() => onGetUserInfoClicked()}>Get user info</button>
+            <Button onClick={() => onLoginClicked()}>Login</Button>
+            <Button onClick={() => onGetUserInfoClicked()}>Get user info</Button>
             <br/>
             <CreateGroupPanel afterNewGroupCreationSubmitted={() => usedBelongingGroups.reloadEndpoint()}/>
-
-            <h3>Groups:</h3>
-            <UsedEndpointSuspense usedEndpoint={usedBelongingGroups}>
-                <ul>
-                    {usedBelongingGroups.data?.map(group => (
-                        <li key={group.id}><Link href={`/group/${group.id}`}>{group.name} ({group.id})</Link></li>
-                    ))}
-                </ul>
-            </UsedEndpointSuspense>
+            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                <Paper elevation={12} sx={{padding: 2}}>
+                    <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                        <Typography variant="h4">Your Groups</Typography>
+                    </Box>
+                    <UsedEndpointSuspense usedEndpoint={usedBelongingGroups} pendingNode={GroupLoadSkeleton}>
+                        <List>
+                            {usedBelongingGroups.data?.map(group => (
+                                <div key={group.id}>
+                                    <Link href={`/group/${group.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
+                                        <ListItemButton alignItems="flex-start" disableRipple>
+                                            <ListItemAvatar>
+                                                <Avatar sx={{bgcolor: getAvatarBackgroundColor(group.id)}}>
+                                                    {getFirstLettersOfWords(group.name).substring(0, 2)}
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={group.name}
+                                                secondary={
+                                                    <React.Fragment>
+                                                        <Typography
+                                                            sx={{display: 'inline'}}
+                                                            component="span"
+                                                            variant="body2"
+                                                            color="text.primary"
+                                                        >
+                                                            Végh Béla, Winch Eszter, +4
+                                                        </Typography>
+                                                        {" — 3 days ago"}
+                                                    </React.Fragment>
+                                                }
+                                            />
+                                        </ListItemButton>
+                                    </Link>
+                                    <Divider variant="middle" component="li"/>
+                                </div>
+                            ))}
+                        </List>
+                    </UsedEndpointSuspense>
+                    <Box sx={{display: 'flex', justifyContent: 'right', marginTop: 1}}>
+                        <Button endIcon={<GroupAddIcon/>} variant="outlined" color="secondary">Create new Group</Button>
+                    </Box>
+                </Paper>
+            </Box>
         </main>
     )
 }
@@ -68,7 +146,7 @@ const CreateGroupPanel: FC<CreateGroupPanelProps> = (props) => {
             method: "POST",
             data: {
                 groupName: enteredName,
-            }
+            },
         })
             .then(() => setEnteredName(""))
             .finally(() => {
