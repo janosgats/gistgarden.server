@@ -1,7 +1,10 @@
 'use client'
 import React from "react";
-import Link from "next/link";
-import {createTheme, CssBaseline, ThemeProvider} from '@mui/material';
+import {Box, createTheme, CssBaseline, ThemeProvider} from '@mui/material';
+import {NavBar} from '@/react/components/nav/NavBar';
+
+
+const drawerWidth = 240;
 
 export default function ClientRootLayout({children}: { children: React.ReactNode }) {
 
@@ -22,10 +25,19 @@ export default function ClientRootLayout({children}: { children: React.ReactNode
         <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme>
                 <body>
-                <Link href="/"><h2>Home</h2></Link>
-                <Link href="/t1/"><h2>t1 page</h2></Link>
-
-                {children}
+                <Box sx={{display: 'flex'}}>
+                    <NavBar drawerWidth={drawerWidth}/>
+                    <Box
+                        component="main"
+                        sx={{
+                            flexGrow: 1,
+                            p: 3,
+                            width: {lg: `calc(100% - ${drawerWidth}px)`},
+                        }}
+                    >
+                        {children}
+                    </Box>
+                </Box>
                 </body>
             </CssBaseline>
         </ThemeProvider>
