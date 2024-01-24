@@ -1,11 +1,20 @@
 import React, {FC, ReactNode} from "react";
-import {Box, Divider, Drawer, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography} from '@mui/material';
+import {Box, Divider, Drawer, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, PaperProps, Typography} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import {useRouter} from 'next/navigation';
+
+const commonDrawerPaperProps: Partial<PaperProps<React.ElementType>> = {
+    style: {
+        backgroundImage: 'url("/grass-bottom-background-3.png")',
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'bottom',
+    },
+}
 
 interface Props {
     drawerWidth: number
@@ -65,6 +74,7 @@ export const NavBar: FC<Props> = (props) => {
                             width: props.drawerWidth,
                         },
                     }}
+                    PaperProps={commonDrawerPaperProps}
                     open
                 >
                     <DrawerContent onItemClicked={() => null}/>
@@ -84,6 +94,7 @@ export const NavBar: FC<Props> = (props) => {
                             width: props.drawerWidth,
                         },
                     }}
+                    PaperProps={commonDrawerPaperProps}
                 >
                     <DrawerContent onItemClicked={handleDrawerClose}/>
                 </Drawer>

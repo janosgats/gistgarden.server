@@ -1,20 +1,22 @@
 'use client'
 
-import React, {useState} from "react";
+import React, {FC, useState} from "react";
 import useEndpoint from "@/react/hooks/useEndpoint";
 import {useParams} from "next/navigation";
-import {DevPanel} from "@/react/components/DevPanel";
 import callServer from "@/util/frontend/callServer";
 import {SimpleGroupResponse, SimpleTopicResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {UsedEndpointSuspense} from "@/react/components/UsedEndpointSuspense";
 import {Topic} from "@/react/components/Topic";
+import {Button, Checkbox, CircularProgress, Stack, TextField} from '@mui/material';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import _ from 'lodash';
 
 export default function Page() {
     const params = useParams()
-    const groupId = params['groupId']
+    const groupId = _.parseInt(params['groupId'] as string)
 
 
-    const [newTopicDescription, setNewTopicDescription] = useState<string>()
+    const [isNewTopicAdderOpen, setIsNewTopicAdderOpen] = useState<boolean>(false)
 
     const usedGroup = useEndpoint<SimpleGroupResponse>({
         config: {
@@ -37,17 +39,16 @@ export default function Page() {
         },
     })
 
-    async function onCreateNewTopicClicked() {
+    async function handleTopicDeletion(topicId: number) {
         await callServer({
-            url: '/api/topic/createTopicInGroup',
-            method: "POST",
+            url: '/api/topic/deleteTopic',
+            method: "DELETE",
             data: {
-                groupId: groupId,
-                topicDescription: newTopicDescription,
+                topicId: topicId,
             },
         })
-            .then(() => {
-                setNewTopicDescription("")
+            .catch(() => {
+                alert('Error while deleting topic')
             })
             .finally(() => {
                 usedTopics.reloadEndpoint()
@@ -55,26 +56,80 @@ export default function Page() {
     }
 
     return (
-        <main>
+        <>
             <h1>Group:&nbsp;
-                <UsedEndpointSuspense usedEndpoint={usedGroup} pendingNode={<span>&#x21bb;</span>} failedNode={'Error loading group name :/'}>
+                <UsedEndpointSuspense usedEndpoint={usedGroup} pendingNode={<CircularProgress/>} failedNode={'Error loading group name :/'}>
                     {usedGroup.data?.name}
                 </UsedEndpointSuspense>
             </h1>
 
             <h3>Topics:</h3>
             <UsedEndpointSuspense usedEndpoint={usedTopics}>
-                <ul>
+                <Stack spacing={2}>
                     {usedTopics.data?.map(topic => (
-                        <li key={topic.id}><Topic initialTopic={topic}/></li>
+                        <Topic key={topic.id} initialTopic={topic} onDeleteRequest={() => handleTopicDeletion(topic.id)}/>
                     ))}
-                </ul>
-            </UsedEndpointSuspense>
 
-            <DevPanel>
-                <input value={newTopicDescription} onChange={e => setNewTopicDescription(e.target.value)}/>
-                <button onClick={() => onCreateNewTopicClicked()}>Add new topic</button>
-            </DevPanel>
-        </main>
+                    {!isNewTopicAdderOpen && (
+                        <Button variant="outlined" onClick={() => setIsNewTopicAdderOpen(true)} startIcon={<AddOutlinedIcon/>}>Add new topic</Button>
+                    )}
+                    {isNewTopicAdderOpen && (
+                        <NewTopicAdder groupId={groupId} afterNewTopicSaved={() => {
+                            usedTopics.reloadEndpoint()
+                            setIsNewTopicAdderOpen(false)
+                        }}/>
+                    )}
+
+
+                </Stack>
+            </UsedEndpointSuspense>
+        </>
     )
+}
+
+interface NewTopicAdderProps {
+    groupId: number
+    afterNewTopicSaved: () => void
+}
+
+const NewTopicAdder: FC<NewTopicAdderProps> = (props) => {
+    const [newTopicDescription, setNewTopicDescription] = useState<string>('')
+
+    async function saveNewTopic() {
+        if (!newTopicDescription) {
+            return
+        }
+
+        await callServer({
+            url: '/api/topic/createTopicInGroup',
+            method: "POST",
+            data: {
+                groupId: props.groupId,
+                topicDescription: newTopicDescription,
+            },
+        })
+            .catch(() => {
+                alert('Error while saving new topic. Please try again')
+            })
+            .then(() => {
+                setNewTopicDescription("")
+                props.afterNewTopicSaved()
+            })
+    }
+
+    return (<Stack direction="row">
+        <Checkbox
+            color="secondary"
+            checked={false}
+            disabled
+        />
+        <TextField
+            multiline
+            fullWidth
+            placeholder="Enter some text..."
+            value={newTopicDescription}
+            onChange={e => setNewTopicDescription(e.target.value)}
+            onBlur={() => saveNewTopic()}
+        />
+    </Stack>)
 }

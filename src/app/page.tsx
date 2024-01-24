@@ -77,7 +77,7 @@ export default function Home() {
 
 
     return (
-        <main>
+        <>
             <h1>Valami</h1>
 
             <Button onClick={() => onLoginClicked()}>Login</Button>
@@ -128,7 +128,7 @@ export default function Home() {
                     </Box>
                 </Paper>
             </Box>
-        </main>
+        </>
     )
 }
 

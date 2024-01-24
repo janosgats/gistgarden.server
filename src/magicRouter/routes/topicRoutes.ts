@@ -88,6 +88,25 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
         },
     )
 
+
+    magicRouter.setSimpleJsonHandler('DELETE', PATH_PREFIX_TOPIC + '/deleteTopic',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            await callUpstream({
+                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                url: '/api/userInitiated/topic/deleteTopic',
+                method: 'DELETE',
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    topicId: request.body.topicId,
+                },
+            })
+
+            return {}
+        },
+    )
+
 }
 
 

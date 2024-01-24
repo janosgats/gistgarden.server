@@ -8,6 +8,7 @@ export interface UseEndpointCommand<T, R = T> {
     customSuccessProcessor?: (axiosResponse: AxiosResponse<T>) => R;
     sendRequestOnDependencyChange?: boolean;
     initialPending?: boolean;
+    keepDataOnRefresh?: boolean;
     onError?: () => void;
 }
 
@@ -27,6 +28,7 @@ const useEndpoint = <T, R = T>({
                                    customSuccessProcessor,
                                    sendRequestOnDependencyChange = true,
                                    initialPending = true,
+                                   keepDataOnRefresh = false,
                                    onError,
                                }: UseEndpointCommand<T, R>): UsedEndpoint<R> => {
     const [data, setData] = React.useState<R | null>(null);
@@ -36,7 +38,9 @@ const useEndpoint = <T, R = T>({
 
     const refreshOnChange = () => {
         setPending(true);
-        setData(null);
+        if (!keepDataOnRefresh) {
+            setData(null);
+        }
         setSucceeded(false);
         setError(false);
 

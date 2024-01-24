@@ -2,9 +2,16 @@ import React, {FC, useState} from "react";
 import {SimpleTopicResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {CallStatus} from "@/util/both/CallStatus";
 import callServer from "@/util/frontend/callServer";
+import {Checkbox, CircularProgress, IconButton, Stack, TextField, Tooltip} from '@mui/material';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import {ProgressColors} from '@/react/res/ProgressColors';
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import DragIndicatorOutlinedIcon from '@mui/icons-material/DragIndicatorOutlined';
 
 interface Props {
-    initialTopic: SimpleTopicResponse
+    initialTopic: SimpleTopicResponse,
+    onDeleteRequest: () => void
 }
 
 export const Topic: FC<Props> = (props) => {
@@ -68,19 +75,63 @@ export const Topic: FC<Props> = (props) => {
             })
     }
 
-    return (<>
-        {toggleIsDoneStateCallStatus === CallStatus.PENDING ? (
-            <span>&#x21bb;</span>
-        ) : (
-            <input type="checkbox" checked={lastSavedTopicState.isDone} onChange={() => toggleIsDoneState()}/>
+    return (<Stack direction="row">
+        <Stack>
+            <Tooltip title="Drag to reorder">
+                <IconButton sx={{paddingLeft: 0, paddingRight: 0}}>
+                    <DragIndicatorOutlinedIcon/>
+                </IconButton>
+            </Tooltip>
+        </Stack>
+        <Stack>
+            {toggleIsDoneStateCallStatus === CallStatus.PENDING ? (
+                <CircularProgress size="1.375rem" sx={{margin: '10px', color: ProgressColors.pending}}/>
+            ) : (
+                <Checkbox
+                    color="secondary"
+                    checked={lastSavedTopicState.isDone}
+                    onChange={() => toggleIsDoneState()}
+                />
+            )}
+            {toggleIsDoneStateCallStatus === CallStatus.FAILURE && <span>Error while saving <button onClick={() => toggleIsDoneState()}>Retry</button></span>}
+
+        </Stack>
+
+        <TextField
+            multiline
+            fullWidth
+            placeholder="Enter some text..."
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            onBlur={() => saveNewDescriptionIfChanged()}
+            sx={{...(lastSavedTopicState?.isDone && {textDecoration: "line-through", color: 'gray'})}}
+            InputProps={{...(lastSavedTopicState?.isDone && {style: {color: 'gray'}})}}
+        />
+
+        {saveNewDescriptionCallStatus === CallStatus.PENDING && (
+            <CircularProgress size="1.375rem" sx={{marginTop: '0.7rem', marginLeft: '-1.9rem', color: ProgressColors.pending}}/>
         )}
-        {toggleIsDoneStateCallStatus === CallStatus.FAILURE && <span>Error while saving <button onClick={() => toggleIsDoneState()}>Retry</button></span>}
 
-
-        <input value={description} onChange={e => setDescription(e.target.value)} onBlur={() => saveNewDescriptionIfChanged()}/>
-        ({props.initialTopic.id})
-        {saveNewDescriptionCallStatus === CallStatus.PENDING && <span>saving...</span>}
-        {saveNewDescriptionCallStatus === CallStatus.SUCCESS && didLastSaveFinishInTheNearPast && <span>Saved</span>}
+        {saveNewDescriptionCallStatus === CallStatus.SUCCESS && didLastSaveFinishInTheNearPast && (
+            <CheckCircleOutlinedIcon sx={{marginTop: '0.7rem', marginLeft: '-1.9rem', color: ProgressColors.success}}/>
+        )}
         {saveNewDescriptionCallStatus === CallStatus.FAILURE && <span>Error while saving <button onClick={() => saveNewDescriptionIfChanged()}>Retry</button></span>}
-    </>)
+
+        <Stack>
+            <Tooltip title="Archive">
+                <IconButton onClick={() => alert('TODO: implement archival')}>
+                    <ArchiveOutlinedIcon sx={{color: "orange"}}/>
+                </IconButton>
+            </Tooltip>
+        </Stack>
+        <Stack>
+            <Tooltip title="Delete Topic">
+                <IconButton onClick={() => {
+                    confirm("Do you want to delete this topic? This action cannot be undone") && props.onDeleteRequest()
+                }}>
+                    <DeleteForeverOutlinedIcon sx={{color: "red"}}/>
+                </IconButton>
+            </Tooltip>
+        </Stack>
+    </Stack>)
 }

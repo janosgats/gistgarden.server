@@ -21,7 +21,6 @@ export default function ClientRootLayout({children}: { children: React.ReactNode
     });
 
     return (
-        <html lang="en">
         <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme>
                 <body>
@@ -41,6 +40,5 @@ export default function ClientRootLayout({children}: { children: React.ReactNode
                 </body>
             </CssBaseline>
         </ThemeProvider>
-        </html>
     )
 }
