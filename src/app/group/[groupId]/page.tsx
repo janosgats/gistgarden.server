@@ -124,9 +124,11 @@ const NewTopicAdder: FC<NewTopicAdderProps> = (props) => {
             disabled
         />
         <TextField
+            variant="standard"
             multiline
             fullWidth
-            placeholder="Enter some text..."
+            placeholder="Enter your new topic..."
+            autoFocus
             value={newTopicDescription}
             onChange={e => setNewTopicDescription(e.target.value)}
             onBlur={() => saveNewTopic()}

@@ -98,14 +98,15 @@ export const Topic: FC<Props> = (props) => {
         </Stack>
 
         <TextField
+            variant="standard"
             multiline
             fullWidth
             placeholder="Enter some text..."
             value={description}
             onChange={e => setDescription(e.target.value)}
             onBlur={() => saveNewDescriptionIfChanged()}
+            disabled={lastSavedTopicState.isDone}
             sx={{...(lastSavedTopicState?.isDone && {textDecoration: "line-through", color: 'gray'})}}
-            InputProps={{...(lastSavedTopicState?.isDone && {style: {color: 'gray'}})}}
         />
 
         {saveNewDescriptionCallStatus === CallStatus.PENDING && (
