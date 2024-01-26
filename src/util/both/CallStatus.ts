@@ -1,6 +1,11 @@
 export enum CallStatus {
     OPEN,
     PENDING,
-    FAILURE,
-    SUCCESS,
+    FAILED,
+    SUCCEEDED,
+}
+
+export enum CallResult {
+    FAILED,
+    SUCCEEDED,
 }

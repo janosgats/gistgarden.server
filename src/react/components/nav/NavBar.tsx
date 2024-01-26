@@ -18,6 +18,7 @@ const commonDrawerPaperProps: Partial<PaperProps<React.ElementType>> = {
 
 interface Props {
     drawerWidth: number
+    openQuickAddPointDialog: () => void
 }
 
 export const NavBar: FC<Props> = (props) => {
@@ -77,7 +78,7 @@ export const NavBar: FC<Props> = (props) => {
                     PaperProps={commonDrawerPaperProps}
                     open
                 >
-                    <DrawerContent onItemClicked={() => null}/>
+                    <DrawerContent onItemClicked={() => null} openQuickAddPointDialog={props.openQuickAddPointDialog}/>
                 </Drawer>
                 <Drawer
                     variant="temporary"
@@ -96,7 +97,7 @@ export const NavBar: FC<Props> = (props) => {
                     }}
                     PaperProps={commonDrawerPaperProps}
                 >
-                    <DrawerContent onItemClicked={handleDrawerClose}/>
+                    <DrawerContent onItemClicked={handleDrawerClose} openQuickAddPointDialog={props.openQuickAddPointDialog}/>
                 </Drawer>
             </Box>
         </Box>
@@ -106,6 +107,7 @@ export const NavBar: FC<Props> = (props) => {
 
 interface DrawerContentProps {
     onItemClicked: () => void
+    openQuickAddPointDialog: () => void
 }
 
 const DrawerContent: FC<DrawerContentProps> = (props) => {
@@ -153,7 +155,7 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
             </List>
             <Divider/>
             <List>
-                <BasicMenuItem text="I have a point!" icon={<CreateOutlinedIcon/>} action={() => alert('TODO: show topic-adder modal')}/>
+                <BasicMenuItem text="Quickly Add a Point!" icon={<CreateOutlinedIcon/>} action={() => handleMenuItemClick(props.openQuickAddPointDialog)}/>
             </List>
             <Divider/>
             <List>

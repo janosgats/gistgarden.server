@@ -39,11 +39,11 @@ export const Topic: FC<Props> = (props) => {
             },
         })
             .then(() => {
-                setSaveNewDescriptionCallStatus(CallStatus.SUCCESS)
+                setSaveNewDescriptionCallStatus(CallStatus.SUCCEEDED)
                 setLastSavedTopicState((prevState) => ({...prevState, description: description}))
             })
             .catch(() => {
-                setSaveNewDescriptionCallStatus(CallStatus.FAILURE)
+                setSaveNewDescriptionCallStatus(CallStatus.FAILED)
             })
             .finally(() => {
                 setDidLastSaveFinishInTheNearPast(true)
@@ -67,11 +67,11 @@ export const Topic: FC<Props> = (props) => {
             },
         })
             .then(() => {
-                setToggleIsDoneStateCallStatus(CallStatus.SUCCESS)
+                setToggleIsDoneStateCallStatus(CallStatus.SUCCEEDED)
                 setLastSavedTopicState((prevState) => ({...prevState, isDone: newIsDone}))
             })
             .catch(() => {
-                setToggleIsDoneStateCallStatus(CallStatus.FAILURE)
+                setToggleIsDoneStateCallStatus(CallStatus.FAILED)
             })
     }
 
@@ -93,7 +93,7 @@ export const Topic: FC<Props> = (props) => {
                     onChange={() => toggleIsDoneState()}
                 />
             )}
-            {toggleIsDoneStateCallStatus === CallStatus.FAILURE && <span>Error while saving <button onClick={() => toggleIsDoneState()}>Retry</button></span>}
+            {toggleIsDoneStateCallStatus === CallStatus.FAILED && <span>Error while saving <button onClick={() => toggleIsDoneState()}>Retry</button></span>}
 
         </Stack>
 
@@ -113,10 +113,10 @@ export const Topic: FC<Props> = (props) => {
             <CircularProgress size="1.375rem" sx={{marginTop: '0.7rem', marginLeft: '-1.9rem', color: ProgressColors.pending}}/>
         )}
 
-        {saveNewDescriptionCallStatus === CallStatus.SUCCESS && didLastSaveFinishInTheNearPast && (
+        {saveNewDescriptionCallStatus === CallStatus.SUCCEEDED && didLastSaveFinishInTheNearPast && (
             <CheckCircleOutlinedIcon sx={{marginTop: '0.7rem', marginLeft: '-1.9rem', color: ProgressColors.success}}/>
         )}
-        {saveNewDescriptionCallStatus === CallStatus.FAILURE && <span>Error while saving <button onClick={() => saveNewDescriptionIfChanged()}>Retry</button></span>}
+        {saveNewDescriptionCallStatus === CallStatus.FAILED && <span>Error while saving <button onClick={() => saveNewDescriptionIfChanged()}>Retry</button></span>}
 
         <Stack>
             <Tooltip title="Archive">

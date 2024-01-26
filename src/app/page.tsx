@@ -7,7 +7,7 @@ import {DevPanel} from "@/react/components/DevPanel";
 import Link from "next/link";
 import {CreateGroupResponse, SimpleGroupResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {UsedEndpointSuspense} from "@/react/components/UsedEndpointSuspense";
-import {Avatar, Box, Button, Divider, List, ListItemAvatar, ListItemButton, ListItemText, Paper, Skeleton, Stack, Typography} from '@mui/material';
+import {Avatar, Box, Button, Card, CardActions, CardContent, Divider, List, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Stack, Typography} from '@mui/material';
 import _ from 'lodash';
 import {Property} from 'csstype';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -84,49 +84,52 @@ export default function Home() {
             <Button onClick={() => onGetUserInfoClicked()}>Get user info</Button>
             <br/>
             <CreateGroupPanel afterNewGroupCreationSubmitted={() => usedBelongingGroups.reloadEndpoint()}/>
+
             <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                <Paper elevation={12} sx={{padding: 2}}>
-                    <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                        <Typography variant="h4">Your Groups</Typography>
-                    </Box>
-                    <UsedEndpointSuspense usedEndpoint={usedBelongingGroups} pendingNode={GroupLoadSkeleton}>
-                        <List>
-                            {usedBelongingGroups.data?.map(group => (
-                                <div key={group.id}>
-                                    <Link href={`/group/${group.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
-                                        <ListItemButton alignItems="flex-start" disableRipple>
-                                            <ListItemAvatar>
-                                                <Avatar sx={{bgcolor: getAvatarBackgroundColor(group.id)}}>
-                                                    {getFirstLettersOfWords(group.name).substring(0, 2)}
-                                                </Avatar>
-                                            </ListItemAvatar>
-                                            <ListItemText
-                                                primary={group.name}
-                                                secondary={
-                                                    <React.Fragment>
-                                                        <Typography
-                                                            sx={{display: 'inline'}}
-                                                            component="span"
-                                                            variant="body2"
-                                                            color="text.primary"
-                                                        >
-                                                            Végh Béla, Winch Eszter, +4
-                                                        </Typography>
-                                                        {" — 3 days ago"}
-                                                    </React.Fragment>
-                                                }
-                                            />
-                                        </ListItemButton>
-                                    </Link>
-                                    <Divider variant="middle" component="li"/>
-                                </div>
-                            ))}
-                        </List>
-                    </UsedEndpointSuspense>
-                    <Box sx={{display: 'flex', justifyContent: 'right', marginTop: 1}}>
+                <Card variant="elevation" elevation={12}>
+                    <CardContent>
+                        <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                            <Typography variant="h4">Your Groups</Typography>
+                        </Box>
+                        <UsedEndpointSuspense usedEndpoint={usedBelongingGroups} pendingNode={GroupLoadSkeleton}>
+                            <List>
+                                {usedBelongingGroups.data?.map((group, index) => (
+                                    <div key={group.id}>
+                                        {index > 0 && <Divider variant="middle" component="li"/>}
+                                        <Link href={`/group/${group.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
+                                            <ListItemButton alignItems="flex-start" disableRipple>
+                                                <ListItemAvatar>
+                                                    <Avatar sx={{bgcolor: getAvatarBackgroundColor(group.id)}}>
+                                                        {getFirstLettersOfWords(group.name).substring(0, 2)}
+                                                    </Avatar>
+                                                </ListItemAvatar>
+                                                <ListItemText
+                                                    primary={group.name}
+                                                    secondary={
+                                                        <React.Fragment>
+                                                            <Typography
+                                                                sx={{display: 'inline'}}
+                                                                component="span"
+                                                                variant="body2"
+                                                                color="text.primary"
+                                                            >
+                                                                Végh Béla, Winch Eszter, +4
+                                                            </Typography>
+                                                            {" — 3 days ago"}
+                                                        </React.Fragment>
+                                                    }
+                                                />
+                                            </ListItemButton>
+                                        </Link>
+                                    </div>
+                                ))}
+                            </List>
+                        </UsedEndpointSuspense>
+                    </CardContent>
+                    <CardActions sx={{justifyContent: 'right'}}>
                         <Button endIcon={<GroupAddIcon/>} variant="outlined" color="secondary">Create new Group</Button>
-                    </Box>
-                </Paper>
+                    </CardActions>
+                </Card>
             </Box>
         </>
     )
