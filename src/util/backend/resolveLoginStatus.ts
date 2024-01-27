@@ -26,12 +26,12 @@ export async function resolveLoginStatus(): Promise<LoginStatus> {
     }
 
     const upstreamResponse = await callUpstream<ResolveJwtResponse>({
-        baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+        baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
         url: '/api/userAuth/resolveJwt',
         method: 'POST',
         data: {
-            jwt: cookies.get(JWT_COOKIE_NAME)!.value
-        }
+            jwt: cookies.get(JWT_COOKIE_NAME)!.value,
+        },
     })
 
     return {

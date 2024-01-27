@@ -9,7 +9,7 @@ function matcherOf(domain: string, mainTypeId: number, subTypeId: number): Match
 const CommonProblemMatchers = {
     PpCommon: {
         InvalidFields: {
-            INVALID_FIELDS: matcherOf(ProblemRelayConstants.DOMAIN.PpWs, 1, 1),
+            INVALID_FIELDS: matcherOf(ProblemRelayConstants.DOMAIN.GgWs, 1, 1),
         },
     },
 };

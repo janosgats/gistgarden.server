@@ -11,19 +11,22 @@ export default function Home() {
             <h1>T1</h1>
 
             <ul>
-                <li>private points</li>
-                <li>adding a random point: Quick Add</li>
-                <li>viewing points together: Views</li>
+                <li>easy sharing, search, and creation of topics</li>
+                <li>private topics</li>
+                <li>adding a random topic: Quick Add</li>
+                <li>viewing topics together: Views</li>
                 <ul>
                     <li>built-in views</li>
                     <ul>
-                        <li>every new point</li>
+                        <li>every new topic</li>
                         <li>every 1:1</li>
-                        <li>every point that belongs to any person in a specified group</li>
+                        <li>every topic related to a person</li>
+                        <li>every topic that relates to any person in a specified group</li>
+                        <li>AI LLM based indexing and LLM search in topic</li>
                     </ul>
                     <li>custom views in which you can set custom filters. MVP: multiple groups included in filter</li>
                 </ul>
-                <li>private points for a set of people during conversation</li>
+                <li>private topics for a set of people during conversation</li>
                 <ul>
                     <li>use Views</li>
                     <li>use &quot;view together with&quot; feature on top of a group&apos;s page</li>

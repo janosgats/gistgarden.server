@@ -14,7 +14,7 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             const upstreamResponse = await callUpstream<SimpleGroupResponse[]>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/groupManagement/listBelongingGroups',
                 params: {
                     initiatorUserId: loggedInUserId,
@@ -34,7 +34,7 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             const upstreamResponse = await callUpstream<CreateGroupResponse>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/groupManagement/createGroup',
                 method: "POST",
                 data: {
@@ -55,7 +55,7 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             await callUpstream<CreateGroupResponse>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/groupManagement/setGroupName',
                 method: "POST",
                 data: {
@@ -75,7 +75,7 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             const upstreamResponse = await callUpstream<SimpleGroupResponse[]>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/groupManagement/getGroup',
                 method: 'POST',
                 data: {

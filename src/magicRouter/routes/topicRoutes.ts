@@ -13,7 +13,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             await callUpstream({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/topic/createTopicInGroup',
                 method: "POST",
                 data: {
@@ -33,7 +33,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             const upstreamResponse = await callUpstream<SimpleTopicResponse[]>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/topic/listTopicsInGroup',
                 method: 'POST',
                 data: {
@@ -54,7 +54,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             const upstreamResponse = await callUpstream<SimpleTopicResponse[]>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/topic/setDescription',
                 method: 'POST',
                 data: {
@@ -74,7 +74,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             const upstreamResponse = await callUpstream<SimpleTopicResponse[]>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/topic/setIsDoneState',
                 method: 'POST',
                 data: {
@@ -94,7 +94,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             await callUpstream({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userInitiated/topic/deleteTopic',
                 method: 'DELETE',
                 data: {

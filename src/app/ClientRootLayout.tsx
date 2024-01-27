@@ -1,5 +1,5 @@
 'use client'
-import React, {useState} from "react";
+import React, {FC, useState} from "react";
 import {Box, CssBaseline} from '@mui/material';
 import {NavBar} from '@/react/components/nav/NavBar';
 import {QuickAddPointDialog} from '@/react/components/quickAddPoint/QuickAddPointDialog';
@@ -29,8 +29,29 @@ export default function ClientRootLayout({children}: { children: React.ReactNode
                     </Box>
                 </Box>
                 <QuickAddPointDialog isOpen={isQuickAddPointDialogOpen} onClose={() => setIsQuickAddPointDialogOpen(false)}/>
+                <BottomDecoration/>
                 </body>
             </CssBaseline>
         </ThemeSelectorContextProvider>
     )
+}
+
+const BottomDecoration: FC = () => {
+    return (<>
+        <div>
+            <img
+                src="/res/img/grass-footer-3.svg"
+                alt="lively grass footer"
+                style={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    transform: 'translateY(10%) translateX(-6%)',
+                    minWidth: '110vw',
+                    minHeight: '30vh',
+                    zIndex: -9999,
+                }}
+            />
+        </div>
+    </>)
 }

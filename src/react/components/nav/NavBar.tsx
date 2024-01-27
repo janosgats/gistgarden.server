@@ -1,5 +1,5 @@
 import React, {FC, ReactNode, useContext} from "react";
-import {Box, Divider, Drawer, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, PaperProps, Switch, Tooltip, Typography} from '@mui/material';
+import {Box, Divider, Drawer, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Switch, Tooltip, Typography} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
@@ -11,15 +11,7 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import Brightness4OutlinedIcon from '@mui/icons-material/Brightness4Outlined';
 import {ThemeOption, ThemeSelectorContext} from '@/react/context/ThemeSelectorContext';
-
-const commonDrawerPaperProps: Partial<PaperProps<React.ElementType>> = {
-    sx: {
-        backgroundImage: 'url("/grass-bottom-background-3.png")',
-        backgroundSize: 'contain',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'bottom',
-    },
-}
+import GrassIcon from '@mui/icons-material/Grass';
 
 interface Props {
     drawerWidth: number
@@ -80,7 +72,7 @@ export const NavBar: FC<Props> = (props) => {
                             width: props.drawerWidth,
                         },
                     }}
-                    PaperProps={{sx: {...commonDrawerPaperProps.sx, borderRight: 0}}}
+                    PaperProps={{sx: {backgroundColor: 'transparent', borderRight: 0}}}
                     open
                 >
                     <DrawerContent onItemClicked={() => null} openQuickAddPointDialog={props.openQuickAddPointDialog}/>
@@ -100,7 +92,6 @@ export const NavBar: FC<Props> = (props) => {
                             width: props.drawerWidth,
                         },
                     }}
-                    PaperProps={commonDrawerPaperProps}
                 >
                     <DrawerContent onItemClicked={handleDrawerClose} openQuickAddPointDialog={props.openQuickAddPointDialog}/>
                 </Drawer>
@@ -153,9 +144,21 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
             <List>
                 <ListItem>
                     <ListItemButton onClick={() => handleRouterPushingMenuItemClick('/')}>
-                        <Typography color="orange" fontWeight="bold">
-                            PointPulse
-                        </Typography>
+                        <Stack
+                            width="100%"
+                            direction="row"
+                            justifyContent="center"
+                            alignItems="center"
+                            display="flex"
+                            flexDirection="row"
+                            spacing={1}
+                            color="#C4FF00"
+                        >
+                            <Typography fontWeight="bold" variant="h6">
+                                Gist Garden
+                            </Typography>
+                            <GrassIcon sx={{fontSize: "2rem"}}/>
+                        </Stack>
                     </ListItemButton>
                 </ListItem>
             </List>

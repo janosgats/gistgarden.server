@@ -13,11 +13,11 @@ export function setUserRoutes(magicRouter: MagicRouter) {
             const loggedInUserId = await resolveLoggedInUserId()
 
             const upstreamResponse = await callUpstream<UserInfoResponse>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/user/userInfo',
                 params: {
-                    userId: loggedInUserId
-                }
+                    userId: loggedInUserId,
+                },
             })
 
 

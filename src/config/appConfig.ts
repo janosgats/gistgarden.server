@@ -1,5 +1,5 @@
 export interface UpstreamApisConfig {
-    pointPulseWebserviceBaseUrl: string;
+    gistGardenWebserviceBaseUrl: string;
 }
 
 export interface AppConfig {
@@ -10,7 +10,7 @@ export interface AppConfig {
 
 const devConfig: AppConfig = {
     upstreamApis: {
-        pointPulseWebserviceBaseUrl: 'http://localhost:3001',
+        gistGardenWebserviceBaseUrl: 'http://localhost:3001',
     },
     useSecureDirectiveWhenSettingJwtCookie: false,
 }

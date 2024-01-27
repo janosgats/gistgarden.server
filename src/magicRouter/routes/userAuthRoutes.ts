@@ -18,7 +18,7 @@ export function setUserAuthRoutes(magicRouter: MagicRouter) {
 
 
             const loginResponse = await callUpstream<LoginResponse>({
-                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
                 url: '/api/userAuth/mockLogin',
                 method: "post",
             })
