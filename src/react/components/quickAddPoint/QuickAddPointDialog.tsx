@@ -1,6 +1,6 @@
 import React, {FC, useRef, useState} from "react";
 import callServer from "@/util/frontend/callServer";
-import {Dialog, DialogTitle, IconButton, InputAdornment, Slide, TextField, Tooltip} from '@mui/material';
+import {Dialog, DialogContent, DialogTitle, IconButton, InputAdornment, Slide, TextField, Tooltip} from '@mui/material';
 import {TransitionProps} from '@mui/material/transitions';
 import {AddToGroupSearcher} from '@/react/components/quickAddPoint/AddToGroupSearcher';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
@@ -31,37 +31,38 @@ export const QuickAddPointDialog: FC<Props> = (props) => {
             open={props.isOpen}
             onClose={props.onClose}
             TransitionComponent={Transition}
-            PaperProps={{sx: {padding: 2}}}
             fullWidth
         >
             <DialogTitle>{"'have a point?"}</DialogTitle>
-            <TextField
-                inputRef={topicDescriptionInputRef}
-                variant="standard"
-                multiline
-                fullWidth
-                placeholder="Enter your new point..."
-                autoFocus
-                value={newTopicDescription}
-                onChange={e => setNewTopicDescription(e.target.value)}
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <Tooltip title="Clear">
-                                <IconButton onClick={() => {
-                                    setNewTopicDescription('');
-                                    topicDescriptionInputRef.current?.focus?.()
-                                }}>
-                                    <ClearOutlinedIcon/>
-                                </IconButton>
-                            </Tooltip>
-                        </InputAdornment>
-                    ),
-                }}
-            />
-            <br/>
-            <br/>
-            <AddToGroupSearcher onAddToGroupClicked={async (groupId) => addTopicToGroup(groupId, newTopicDescription)} closeDialog={props.onClose}/>
+            <DialogContent>
+                <TextField
+                    inputRef={topicDescriptionInputRef}
+                    variant="standard"
+                    multiline
+                    fullWidth
+                    placeholder="Enter your new point..."
+                    autoFocus
+                    value={newTopicDescription}
+                    onChange={e => setNewTopicDescription(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <Tooltip title="Clear">
+                                    <IconButton onClick={() => {
+                                        setNewTopicDescription('');
+                                        topicDescriptionInputRef.current?.focus?.()
+                                    }}>
+                                        <ClearOutlinedIcon/>
+                                    </IconButton>
+                                </Tooltip>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+                <br/>
+                <br/>
+                <AddToGroupSearcher onAddToGroupClicked={async (groupId) => addTopicToGroup(groupId, newTopicDescription)} closeDialog={props.onClose}/>
+            </DialogContent>
         </Dialog>
     </>)
 }

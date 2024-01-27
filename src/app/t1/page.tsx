@@ -15,14 +15,21 @@ export default function Home() {
                 <li>adding a random point: Quick Add</li>
                 <li>viewing points together: Views</li>
                 <ul>
-                    <li>built-in views, like every new point, every 1:1</li>
+                    <li>built-in views</li>
+                    <ul>
+                        <li>every new point</li>
+                        <li>every 1:1</li>
+                        <li>every point that belongs to any person in a specified group</li>
+                    </ul>
                     <li>custom views in which you can set custom filters. MVP: multiple groups included in filter</li>
                 </ul>
                 <li>private points for a set of people during conversation</li>
                 <ul>
                     <li>use Views</li>
-                    <li>use "view together with" feature on top of a group's page</li>
+                    <li>use &quot;view together with&quot; feature on top of a group&apos;s page</li>
                 </ul>
+                <li>reorder topics</li>
+                <li>1:1s</li>
             </ul>
 
 

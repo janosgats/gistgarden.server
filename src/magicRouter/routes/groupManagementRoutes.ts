@@ -50,6 +50,26 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
     )
 
 
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/setGroupName',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            await callUpstream<CreateGroupResponse>({
+                baseURL: appConfig.upstreamApis.pointPulseWebserviceBaseUrl,
+                url: '/api/userInitiated/groupManagement/setGroupName',
+                method: "POST",
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    groupId: request.body.groupId,
+                    newGroupName: request.body.newGroupName,
+                },
+            })
+
+            return {}
+        },
+    )
+
+
     magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/getGroup',
         async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
             const loggedInUserId = await resolveLoggedInUserId()

@@ -1,14 +1,19 @@
-import React, {FC, ReactNode} from "react";
-import {Box, Divider, Drawer, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, PaperProps, Typography} from '@mui/material';
+import React, {FC, ReactNode, useContext} from "react";
+import {Box, Divider, Drawer, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, PaperProps, Switch, Tooltip, Typography} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import ViewAgendaOutlinedIcon from '@mui/icons-material/ViewAgendaOutlined';
 import {useRouter} from 'next/navigation';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import Brightness4OutlinedIcon from '@mui/icons-material/Brightness4Outlined';
+import {ThemeOption, ThemeSelectorContext} from '@/react/context/ThemeSelectorContext';
 
 const commonDrawerPaperProps: Partial<PaperProps<React.ElementType>> = {
-    style: {
+    sx: {
         backgroundImage: 'url("/grass-bottom-background-3.png")',
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
@@ -75,7 +80,7 @@ export const NavBar: FC<Props> = (props) => {
                             width: props.drawerWidth,
                         },
                     }}
-                    PaperProps={commonDrawerPaperProps}
+                    PaperProps={{sx: {...commonDrawerPaperProps.sx, borderRight: 0}}}
                     open
                 >
                     <DrawerContent onItemClicked={() => null} openQuickAddPointDialog={props.openQuickAddPointDialog}/>
@@ -112,6 +117,7 @@ interface DrawerContentProps {
 
 const DrawerContent: FC<DrawerContentProps> = (props) => {
     const router = useRouter()
+    const themeSelectorContext = useContext(ThemeSelectorContext)
 
     function handleMenuItemClick(action: () => void) {
         props.onItemClicked()
@@ -159,6 +165,10 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
             </List>
             <Divider/>
             <List>
+                <BasicMenuItem text="Views" icon={<ViewAgendaOutlinedIcon/>} action={() => handleRouterPushingMenuItemClick("/views")}/>
+            </List>
+            <Divider/>
+            <List>
                 <BasicRouterPushingMenuItem text="Settings" icon={<SettingsOutlinedIcon/>} href="/settings"/>
                 <BasicMenuItem text="Log out" icon={<LogoutOutlinedIcon/>} action={() => alert('TODO: log out')}/>
             </List>
@@ -172,6 +182,16 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
                         `window.screen.*: ${window.screen.width}x${window.screen.height}\n`,
                     )
                 }/>
+                <ListItem>
+                    <ListItemIcon>
+                        <Brightness4OutlinedIcon/>
+                    </ListItemIcon>
+                    <DarkModeOutlinedIcon/>
+                    <Tooltip title={'Switch to ' + (themeSelectorContext.currentThemeOption === ThemeOption.LIGHT ? 'dark' : 'light') + ' theme'}>
+                        <Switch color="secondary" value={themeSelectorContext.currentThemeOption === ThemeOption.LIGHT} onClick={() => themeSelectorContext.toggleTheme()}/>
+                    </Tooltip>
+                    <LightModeOutlinedIcon/>
+                </ListItem>
             </List>
         </div>
     )

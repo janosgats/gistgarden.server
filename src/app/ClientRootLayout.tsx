@@ -1,30 +1,18 @@
 'use client'
 import React, {useState} from "react";
-import {Box, createTheme, CssBaseline, ThemeProvider} from '@mui/material';
+import {Box, CssBaseline} from '@mui/material';
 import {NavBar} from '@/react/components/nav/NavBar';
 import {QuickAddPointDialog} from '@/react/components/quickAddPoint/QuickAddPointDialog';
+import {ThemeSelectorContextProvider} from '@/react/context/ThemeSelectorContext';
 
 
 const drawerWidth = 240;
 
 export default function ClientRootLayout({children}: { children: React.ReactNode }) {
-
     const [isQuickAddPointDialogOpen, setIsQuickAddPointDialogOpen] = useState<boolean>(false)
 
-    const theme = createTheme({
-        palette: {
-            mode: 'dark',
-            primary: {
-                main: '#48ff00',
-            },
-            secondary: {
-                main: '#90caf9',
-            },
-        },
-    });
-
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeSelectorContextProvider>
             <CssBaseline enableColorScheme>
                 <body>
                 <Box sx={{display: 'flex'}}>
@@ -43,6 +31,6 @@ export default function ClientRootLayout({children}: { children: React.ReactNode
                 <QuickAddPointDialog isOpen={isQuickAddPointDialogOpen} onClose={() => setIsQuickAddPointDialogOpen(false)}/>
                 </body>
             </CssBaseline>
-        </ThemeProvider>
+        </ThemeSelectorContextProvider>
     )
 }
