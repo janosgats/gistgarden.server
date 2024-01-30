@@ -15,15 +15,16 @@ const devConfig: AppConfig = {
     useSecureDirectiveWhenSettingJwtCookie: false,
 }
 
+const ACTIVE_PROFILE_ENV_VAR_NAME = 'GG_ACTIVE_PROFILE'
 
 function getConfig(): AppConfig {
-    const activeProfile = process.env['ACTIVE_PROFILE']
+    const activeProfile = process.env[ACTIVE_PROFILE_ENV_VAR_NAME]
 
     if (activeProfile === 'dev') {
         return devConfig
     }
 
-    throw Error(`unrecognized ACTIVE_PROFILE: ${activeProfile}`)
+    throw Error(`unrecognized ${ACTIVE_PROFILE_ENV_VAR_NAME}: ${activeProfile}`)
 }
 
 const appConfig = getConfig()
