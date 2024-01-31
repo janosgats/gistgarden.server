@@ -11,6 +11,8 @@ COPY ./package-lock.json ${APP_HOME}/
 RUN npm ci
 
 COPY . ${APP_HOME}/.
+RUN rm .env.local
+ENV GG_ACTIVE_PROFILE=ci_build
 
 RUN npm run build
 
@@ -33,9 +35,9 @@ HEALTHCHECK --interval=15s \
             CMD curl --fail http://localhost:8081/health/ping || exit 1
 
 
-COPY --chown=npm-user:npm-user --from=builder ${BUILDER_APP_HOME}/public ${APP_HOME}/public
-COPY --chown=npm-user:npm-user --from=builder ${BUILDER_APP_HOME}/.next/standalone ${APP_HOME}/
-COPY --chown=npm-user:npm-user --from=builder ${BUILDER_APP_HOME}/.next/static ${APP_HOME}/.next/static
+COPY --chown=nextjs-user:nextjs-user --from=builder ${BUILDER_APP_HOME}/public ${APP_HOME}/public
+COPY --chown=nextjs-user:nextjs-user --from=builder ${BUILDER_APP_HOME}/.next/standalone ${APP_HOME}/
+COPY --chown=nextjs-user:nextjs-user --from=builder ${BUILDER_APP_HOME}/.next/static ${APP_HOME}/.next/static
 
 
 USER nextjs-user
