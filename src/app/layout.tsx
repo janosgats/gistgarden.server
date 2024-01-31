@@ -3,7 +3,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-import React from "react";
+import React, {Suspense} from "react";
 import type {Metadata, Viewport} from 'next'
 import ClientRootLayout from '@/app/ClientRootLayout';
 
@@ -23,9 +23,11 @@ export default function RootLayout({
 
     return (
         <html lang="en">
-        <ClientRootLayout>
-            {children}
-        </ClientRootLayout>
+        <Suspense>
+            <ClientRootLayout>
+                {children}
+            </ClientRootLayout>
+        </Suspense>
         </html>
     )
 }

@@ -1,0 +1,43 @@
+FROM node:18.19-alpine as builder
+
+ENV APP_HOME=/app
+
+RUN mkdir -p ${APP_HOME}
+WORKDIR ${APP_HOME}
+
+COPY ./package.json ${APP_HOME}/
+COPY ./package-lock.json ${APP_HOME}/
+
+RUN npm ci
+
+COPY . ${APP_HOME}/.
+
+RUN npm run build
+
+
+FROM node:18.19-alpine as release
+
+EXPOSE 8081
+ENV BUILDER_APP_HOME=/app
+ENV APP_HOME=/app
+ENV NODE_ENV=production
+
+RUN adduser --disabled-password --uid 10003 nextjs-user
+
+WORKDIR ${APP_HOME}
+
+HEALTHCHECK --interval=15s \
+            --retries=3 \
+            --start-period=1m \
+            --timeout=5s \
+            CMD curl --fail http://localhost:8081/health/ping || exit 1
+
+
+COPY --chown=npm-user:npm-user --from=builder ${BUILDER_APP_HOME}/public ${APP_HOME}/public
+COPY --chown=npm-user:npm-user --from=builder ${BUILDER_APP_HOME}/.next/standalone ${APP_HOME}/
+COPY --chown=npm-user:npm-user --from=builder ${BUILDER_APP_HOME}/.next/static ${APP_HOME}/.next/static
+
+
+USER nextjs-user
+
+CMD ["node", "server.js"]
