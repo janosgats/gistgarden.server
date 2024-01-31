@@ -191,7 +191,7 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
                     </ListItemIcon>
                     <DarkModeOutlinedIcon/>
                     <Tooltip title={'Switch to ' + (themeSelectorContext.currentThemeOption === ThemeOption.LIGHT ? 'dark' : 'light') + ' theme'}>
-                        <Switch color="secondary" value={themeSelectorContext.currentThemeOption === ThemeOption.LIGHT} onClick={() => themeSelectorContext.toggleTheme()}/>
+                        <Switch color="secondary" checked={themeSelectorContext.currentThemeOption === ThemeOption.LIGHT} onClick={() => themeSelectorContext.toggleTheme()}/>
                     </Tooltip>
                     <LightModeOutlinedIcon/>
                 </ListItem>

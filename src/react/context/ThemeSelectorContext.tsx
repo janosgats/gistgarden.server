@@ -1,4 +1,4 @@
-import React, {createContext, FC, ReactNode, useState} from 'react';
+import React, {createContext, FC, ReactNode, useEffect, useState} from 'react';
 import {createTheme, ThemeProvider} from '@mui/material';
 
 export enum ThemeOption {
@@ -17,6 +17,21 @@ export const ThemeSelectorContext = createContext<IThemeSelectorContext>(null as
 
 export const ThemeSelectorContextProvider: FC<{ children: ReactNode }> = ({children}) => {
     const [currentThemeOption, setCurrentThemeOption] = useState<ThemeOption>(ThemeOption.DARK);
+
+    function composeValueToProvide(): IThemeSelectorContext {
+        return {
+            currentThemeOption: currentThemeOption,
+            setThemeOption: (newOption: ThemeOption) => {
+                setCurrentThemeOption(newOption)
+            },
+            toggleTheme: () => {
+                setCurrentThemeOption(currentThemeOption === ThemeOption.LIGHT ? ThemeOption.DARK : ThemeOption.LIGHT)
+            },
+        }
+    }
+
+    const [valueToProvide, setValueToProvide] = useState<IThemeSelectorContext>(() => composeValueToProvide());
+
 
     const darkTheme = createTheme({
         palette: {
@@ -43,15 +58,9 @@ export const ThemeSelectorContextProvider: FC<{ children: ReactNode }> = ({child
     });
 
 
-    const valueToProvide: IThemeSelectorContext = {
-        currentThemeOption: currentThemeOption,
-        setThemeOption: (newOption: ThemeOption) => {
-            setCurrentThemeOption(newOption)
-        },
-        toggleTheme: () => {
-            setCurrentThemeOption(currentThemeOption === ThemeOption.LIGHT ? ThemeOption.DARK : ThemeOption.LIGHT)
-        },
-    }
+    useEffect(() => {
+        setValueToProvide(composeValueToProvide())
+    }, [currentThemeOption])
 
     return (
         <ThemeSelectorContext.Provider value={valueToProvide}>
