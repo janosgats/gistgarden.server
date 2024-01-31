@@ -7,10 +7,12 @@ import {DevPanel} from "@/react/components/DevPanel";
 import Link from "next/link";
 import {CreateGroupResponse, SimpleGroupResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {UsedEndpointSuspense} from "@/react/components/UsedEndpointSuspense";
-import {Avatar, Box, Button, Card, CardActions, CardContent, Divider, List, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Stack, Typography} from '@mui/material';
+import {Avatar, Box, Button, Card, CardActions, CardContent, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Stack, Typography} from '@mui/material';
 import _ from 'lodash';
 import {Property} from 'csstype';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import Grid from '@mui/system/Unstable_Grid';
 
 function getFirstLettersOfWords(sentence: string): string {
     if (!sentence) {
@@ -85,52 +87,83 @@ export default function Home() {
             <br/>
             <CreateGroupPanel afterNewGroupCreationSubmitted={() => usedBelongingGroups.reloadEndpoint()}/>
 
-            <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                <Card variant="elevation" elevation={12}>
-                    <CardContent>
-                        <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                            <Typography variant="h4">Your Groups</Typography>
-                        </Box>
-                        <UsedEndpointSuspense usedEndpoint={usedBelongingGroups} pendingNode={GroupLoadSkeleton}>
+            <Grid container spacing={4} margin={2}>
+                <Grid xs={12} lg="auto">
+                    <Card variant="elevation" elevation={12}>
+                        <CardContent>
+                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                <Typography variant="h4">Your Groups</Typography>
+                            </Box>
+                            <UsedEndpointSuspense usedEndpoint={usedBelongingGroups} pendingNode={GroupLoadSkeleton}>
+                                <List>
+                                    {usedBelongingGroups.data?.map((group, index) => (
+                                        <div key={group.id}>
+                                            {index > 0 && <Divider variant="middle" component="li"/>}
+                                            <Link href={`/group/${group.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
+                                                <ListItemButton alignItems="flex-start" disableRipple>
+                                                    <ListItemAvatar>
+                                                        <Avatar sx={{bgcolor: getAvatarBackgroundColor(group.id)}}>
+                                                            {getFirstLettersOfWords(group.name).substring(0, 2)}
+                                                        </Avatar>
+                                                    </ListItemAvatar>
+                                                    <ListItemText
+                                                        primary={group.name}
+                                                        secondary={
+                                                            <React.Fragment>
+                                                                <Typography
+                                                                    sx={{display: 'inline'}}
+                                                                    component="span"
+                                                                    variant="body2"
+                                                                    color="text.primary"
+                                                                >
+                                                                    Végh Béla, Winch Eszter, +4
+                                                                </Typography>
+                                                                {" — 3 days ago"}
+                                                            </React.Fragment>
+                                                        }
+                                                    />
+                                                </ListItemButton>
+                                            </Link>
+                                        </div>
+                                    ))}
+                                </List>
+                            </UsedEndpointSuspense>
+                        </CardContent>
+                        <CardActions sx={{justifyContent: 'right'}}>
+                            <Button startIcon={<GroupAddIcon/>} variant="outlined" color="secondary">Create new Group</Button>
+                        </CardActions>
+                    </Card>
+                </Grid>
+                <Grid xs={12} lg={5}>
+                    <Card variant="elevation" elevation={12}>
+                        <CardContent>
+                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                <Typography variant="h4">Recent Topics</Typography>
+                            </Box>
                             <List>
-                                {usedBelongingGroups.data?.map((group, index) => (
-                                    <div key={group.id}>
-                                        {index > 0 && <Divider variant="middle" component="li"/>}
-                                        <Link href={`/group/${group.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
-                                            <ListItemButton alignItems="flex-start" disableRipple>
-                                                <ListItemAvatar>
-                                                    <Avatar sx={{bgcolor: getAvatarBackgroundColor(group.id)}}>
-                                                        {getFirstLettersOfWords(group.name).substring(0, 2)}
-                                                    </Avatar>
-                                                </ListItemAvatar>
-                                                <ListItemText
-                                                    primary={group.name}
-                                                    secondary={
-                                                        <React.Fragment>
-                                                            <Typography
-                                                                sx={{display: 'inline'}}
-                                                                component="span"
-                                                                variant="body2"
-                                                                color="text.primary"
-                                                            >
-                                                                Végh Béla, Winch Eszter, +4
-                                                            </Typography>
-                                                            {" — 3 days ago"}
-                                                        </React.Fragment>
-                                                    }
-                                                />
-                                            </ListItemButton>
+                                {_.times(5).map(it => (
+                                    <ListItem key={it}>
+                                        <Link href={"/todo: take to topic anchor in owning group"} style={{color: "inherit", textDecoration: "none"}}>
+                                            <Typography sx={{'&:hover': {color: 'orange'}}}>
+                                                Example Topic {it + 1}
+                                            </Typography>
                                         </Link>
-                                    </div>
+                                    </ListItem>
                                 ))}
                             </List>
-                        </UsedEndpointSuspense>
-                    </CardContent>
-                    <CardActions sx={{justifyContent: 'right'}}>
-                        <Button endIcon={<GroupAddIcon/>} variant="outlined" color="secondary">Create new Group</Button>
-                    </CardActions>
-                </Card>
-            </Box>
+                        </CardContent>
+                        <CardActions sx={{justifyContent: 'right'}}>
+                            <Button
+                                startIcon={<AddOutlinedIcon/>}
+                                variant="outlined"
+                                color="secondary"
+                                onClick={() => alert('TODO: Open QuickAdd')}>
+                                Add a topic
+                            </Button>
+                        </CardActions>
+                    </Card>
+                </Grid>
+            </Grid>
         </>
     )
 }
