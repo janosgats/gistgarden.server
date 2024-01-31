@@ -19,7 +19,7 @@ const k8sc1Config: AppConfig = {
     upstreamApis: {
         gistGardenWebserviceBaseUrl: 'http://gistgarden-ws-cluster-ip:3001',
     },
-    useSecureDirectiveWhenSettingJwtCookie: true,
+    useSecureDirectiveWhenSettingJwtCookie: false,
 }
 
 const ENV_VAR_NAME_ACTIVE_PROFILE = 'GG_ACTIVE_PROFILE'
