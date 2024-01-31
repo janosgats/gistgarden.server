@@ -11,7 +11,7 @@ COPY ./package-lock.json ${APP_HOME}/
 RUN npm ci
 
 COPY . ${APP_HOME}/.
-RUN rm .env.local
+RUN rm -f .env.local
 ENV GG_ACTIVE_PROFILE=ci_build
 
 RUN npm run build
