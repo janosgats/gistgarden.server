@@ -1,6 +1,6 @@
 import React, {FC, useState} from "react";
 import useEndpoint from '@/react/hooks/useEndpoint';
-import {SimpleGroupResponse, SimpleTopicResponse} from '@/magicRouter/routes/groupManagementRoutes';
+import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
 import callServer from '@/util/frontend/callServer';
 import {Button, Checkbox, CircularProgress, IconButton, Stack, TextField, Tooltip, Typography} from '@mui/material';
 import {UsedEndpointSuspense} from '@/react/components/UsedEndpointSuspense';
@@ -10,6 +10,7 @@ import {Topic} from '@/react/components/Topic';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import {RenamerDialog} from '@/react/components/RenamerDialog';
+import {SimpleTopicResponse} from '@/magicRouter/routes/topicRoutes';
 
 interface Props {
     groupId: number
