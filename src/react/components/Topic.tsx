@@ -1,13 +1,14 @@
 import React, {FC, useState} from "react";
-import {SimpleTopicResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {CallStatus} from "@/util/both/CallStatus";
 import callServer from "@/util/frontend/callServer";
-import {Checkbox, CircularProgress, IconButton, Stack, TextField, Tooltip} from '@mui/material';
+import {Avatar, Checkbox, CircularProgress, IconButton, Stack, TextField, Tooltip} from '@mui/material';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import {ProgressColors} from '@/react/res/ProgressColors';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import DragIndicatorOutlinedIcon from '@mui/icons-material/DragIndicatorOutlined';
+import {SimpleTopicResponse} from '@/magicRouter/routes/topicRoutes';
+import {useCurrentUserContext} from '@/react/context/CurrentUserContext';
 
 interface Props {
     initialTopic: SimpleTopicResponse,
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export const Topic: FC<Props> = (props) => {
+    const currentUserContext = useCurrentUserContext()
+
     const [lastSavedTopicState, setLastSavedTopicState] = useState<SimpleTopicResponse>(props.initialTopic)
     const [description, setDescription] = useState<string>(props.initialTopic.description)
 
@@ -75,6 +78,8 @@ export const Topic: FC<Props> = (props) => {
             })
     }
 
+    const wasTopicCreatedByCurrentUser = (props.initialTopic.creatorUserId === currentUserContext.userId) || !props.initialTopic.creatorUserId
+
     return (<Stack direction="row">
         <Stack>
             <Tooltip title="Drag to reorder">
@@ -107,6 +112,17 @@ export const Topic: FC<Props> = (props) => {
             onBlur={() => saveNewDescriptionIfChanged()}
             disabled={lastSavedTopicState.isDone}
             sx={{...(lastSavedTopicState?.isDone && {textDecoration: "line-through", color: 'gray'})}}
+            InputProps={{
+                ...(wasTopicCreatedByCurrentUser ? {} : {
+                    readOnly: true,
+                    sx: {
+                        '&::after': {
+                            borderBottomColor: 'white',
+                        },
+                    },
+                }),
+            }}
+
         />
 
         {saveNewDescriptionCallStatus === CallStatus.PENDING && (
@@ -132,6 +148,15 @@ export const Topic: FC<Props> = (props) => {
                 }}>
                     <DeleteForeverOutlinedIcon sx={{color: "red"}}/>
                 </IconButton>
+            </Tooltip>
+        </Stack>
+        <Stack>
+            <Tooltip title={"Added by user " + props.initialTopic.creatorUserId}>
+                <div style={{padding: 8}}>
+                    <Avatar sx={{width: 26, height: 26, display: 'inline-flex'}}>
+                        {props.initialTopic.creatorUserId}
+                    </Avatar>
+                </div>
             </Tooltip>
         </Stack>
     </Stack>)

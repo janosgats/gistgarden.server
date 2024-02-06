@@ -1,35 +1,62 @@
 import {MagicRouter, SimpleJsonRequest, SimpleJsonResponse} from "@/magicRouter/MagicRouter";
-import {JWT_COOKIE_NAME} from "@/util/backend/resolveLoginStatus";
+import {resolveLoginStatus, SESSION_COOKIE_NAME} from "@/util/backend/resolveLoginStatus";
 import callUpstream from "@/util/backend/callUpstream";
 import appConfig from "@/config/appConfig";
 
 
 const PATH_PREFIX_USER_AUTH = '/api/userAuth'
 
-const YEAR_AS_DAYS = 365
 const DAY_AS_HOURS = 24
 const HOUR_AS_SECONDS = 3600
 const SECOND_AS_MILLIS = 1000
 
 export function setUserAuthRoutes(magicRouter: MagicRouter) {
 
-    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_USER_AUTH + '/login',
-        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_USER_AUTH + '/loginByPassword',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse<LoginByPasswordResponse>> => {
 
-
-            const loginResponse = await callUpstream<LoginResponse>({
+            const createSessionResponse = await callUpstream<CreateSessionUpstreamResponse>({
                 baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
-                url: '/api/userAuth/mockLogin',
+                url: '/api/userAuth/createSessionByPasswordLogin',
                 method: "post",
+                data: {
+                    email: request.body.email,
+                    password: request.body.password,
+                },
             })
 
-            const {jwt} = loginResponse.data
+            if (!createSessionResponse.data.areCredentialsValid) {
+                return {
+                    body: {
+                        areCredentialsValid: false,
+                    },
+                }
+            }
 
-            const secureDirectives = appConfig.useSecureDirectiveWhenSettingJwtCookie ? ' secure; ' : ' '
-            const timestampOfOneYearFromNow = new Date().getTime() + (YEAR_AS_DAYS * DAY_AS_HOURS * HOUR_AS_SECONDS * SECOND_AS_MILLIS)
-            const expirationString = new Date(timestampOfOneYearFromNow).toUTCString()
+            const secureDirectives = appConfig.useSecureDirectiveWhenSettingSessionCookie ? ' secure; ' : ' '
+            const timestampOfExpiry = new Date().getTime() + (4 * DAY_AS_HOURS * HOUR_AS_SECONDS * SECOND_AS_MILLIS)
+            const expirationString = new Date(timestampOfExpiry).toUTCString()
             return {
-                headers: {'Set-Cookie': `${JWT_COOKIE_NAME}=${jwt}; expires='${expirationString}'; path=/; ${secureDirectives} samesite=strict; HttpOnly`},
+                body: {
+                    areCredentialsValid: createSessionResponse.data.areCredentialsValid,
+                },
+                headers: {
+                    'Set-Cookie': `${SESSION_COOKIE_NAME}=${createSessionResponse.data.sessionId}; expires='${expirationString}'; path=/; ` +
+                        `${secureDirectives} samesite=strict; HttpOnly`,
+                },
+            }
+        },
+    )
+
+    magicRouter.setSimpleJsonHandler('GET', PATH_PREFIX_USER_AUTH + '/loginStatus',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse<CurrentUserInfo>> => {
+            const loginStatus = await resolveLoginStatus()
+
+            return {
+                body: {
+                    isLoggedIn: loginStatus.isLoggedIn,
+                    userId: loginStatus.userId,
+                },
             }
         },
         {skipReadingBody: true},
@@ -37,7 +64,17 @@ export function setUserAuthRoutes(magicRouter: MagicRouter) {
 }
 
 
-interface LoginResponse {
-    userId: number;
-    jwt: string;
+interface CreateSessionUpstreamResponse {
+    areCredentialsValid: boolean;
+    userId: number | null;
+    sessionId: string | null;
+}
+
+export interface LoginByPasswordResponse {
+    areCredentialsValid: boolean;
+}
+
+export interface CurrentUserInfo {
+    isLoggedIn: boolean
+    userId: number | null
 }

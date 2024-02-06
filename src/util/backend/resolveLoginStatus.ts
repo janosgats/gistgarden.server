@@ -2,9 +2,11 @@ import callUpstream from "@/util/backend/callUpstream";
 import appConfig from "@/config/appConfig";
 import {cookies as nextCookies} from "next/headers";
 
-export const JWT_COOKIE_NAME = 'jwtToken'
-interface ResolveJwtResponse {
-    userId: number
+export const SESSION_COOKIE_NAME = 'sessionId'
+
+interface ResolveLoginStatusFromSessionIdResponse {
+    isSessionValid: boolean
+    userId: number | null
 }
 
 export interface LoginStatus {
@@ -14,28 +16,28 @@ export interface LoginStatus {
 
 const NOT_LOGGED_IN_RESULT: LoginStatus = {
     isLoggedIn: false,
-    userId: null
+    userId: null,
 }
 
 
 export async function resolveLoginStatus(): Promise<LoginStatus> {
     const cookies = nextCookies()
 
-    if (!cookies.has(JWT_COOKIE_NAME)) {
+    if (!cookies.has(SESSION_COOKIE_NAME)) {
         return NOT_LOGGED_IN_RESULT
     }
 
-    const upstreamResponse = await callUpstream<ResolveJwtResponse>({
+    const upstreamResponse = await callUpstream<ResolveLoginStatusFromSessionIdResponse>({
         baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
-        url: '/api/userAuth/resolveJwt',
+        url: '/api/userAuth/resolveLoginStatusFromSessionId',
         method: 'POST',
         data: {
-            jwt: cookies.get(JWT_COOKIE_NAME)!.value,
+            sessionId: cookies.get(SESSION_COOKIE_NAME)!.value,
         },
     })
 
     return {
-        isLoggedIn: !!upstreamResponse.data.userId,
+        isLoggedIn: upstreamResponse.data.isSessionValid && !!upstreamResponse.data.userId,
         userId: upstreamResponse.data.userId,
     }
 }

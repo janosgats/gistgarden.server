@@ -91,13 +91,6 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
     )
 }
 
-
-export interface SimpleTopicResponse {
-    id: number;
-    isDone: boolean;
-    description: string;
-}
-
 export interface SimpleGroupResponse {
     id: number;
     name: string;

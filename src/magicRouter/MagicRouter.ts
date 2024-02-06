@@ -9,14 +9,14 @@ interface RouteHandler {
     handle: (req: NextRequest) => Promise<NextResponse>
 }
 
-export interface SimpleJsonRequest {
+export interface SimpleJsonRequest<T = any> {
     req: NextRequest
-    body: any
+    body: T
 }
 
-export interface SimpleJsonResponse {
+export interface SimpleJsonResponse<T = any> {
     status?: number
-    body?: any
+    body?: T
     headers?: HeadersInit
 }
 

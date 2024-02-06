@@ -4,7 +4,7 @@ export interface UpstreamApisConfig {
 
 export interface AppConfig {
     upstreamApis: UpstreamApisConfig
-    useSecureDirectiveWhenSettingJwtCookie: boolean
+    useSecureDirectiveWhenSettingSessionCookie: boolean
 }
 
 
@@ -12,14 +12,14 @@ const devConfig: AppConfig = {
     upstreamApis: {
         gistGardenWebserviceBaseUrl: 'http://localhost:3001',
     },
-    useSecureDirectiveWhenSettingJwtCookie: false,
+    useSecureDirectiveWhenSettingSessionCookie: false,
 }
 
 const k8sc1Config: AppConfig = {
     upstreamApis: {
         gistGardenWebserviceBaseUrl: 'http://gistgarden-ws-cluster-ip:3001',
     },
-    useSecureDirectiveWhenSettingJwtCookie: false,
+    useSecureDirectiveWhenSettingSessionCookie: false,
 }
 
 const ENV_VAR_NAME_ACTIVE_PROFILE = 'GG_ACTIVE_PROFILE'

@@ -114,4 +114,5 @@ export interface SimpleTopicResponse {
     id: number;
     isDone: boolean;
     description: string;
+    creatorUserId: number;
 }
