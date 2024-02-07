@@ -50,6 +50,7 @@ export default function Home() {
                     <li>tag based filtering for topics</li>
                     <li>tag based filtering for groups (in Views)</li>
                 </ul>
+                <li>link groups to groups?</li>
             </ul>
 
 
