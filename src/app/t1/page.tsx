@@ -53,6 +53,7 @@ export default function Home() {
                 <li>link groups to groups, topics to groups, topics to topics</li>
                 <ul>
                     <li>graph visualization based on the links</li>
+                    <li>?maybe make the tasks markdowns and use those to create links?</li>
                 </ul>
             </ul>
 
