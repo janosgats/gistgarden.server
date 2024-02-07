@@ -44,6 +44,12 @@ export default function Home() {
                 </ul>
                 <li>reorder topics</li>
                 <li>1:1s</li>
+                <li>take a look at the note-taking app called Obsidian</li>
+                <li>tags</li>
+                <ul>
+                    <li>tag based filtering for topics</li>
+                    <li>tag based filtering for groups (in Views)</li>
+                </ul>
             </ul>
 
 
