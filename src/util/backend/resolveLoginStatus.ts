@@ -1,6 +1,8 @@
 import callUpstream from "@/util/backend/callUpstream";
 import appConfig from "@/config/appConfig";
 import {cookies as nextCookies} from "next/headers";
+import ProducedProblemRelayError from '@/util/both/problemRelay/error/ProducedProblemRelayError';
+import CommonProblemMarkers from '@/util/both/problemRelay/CommonProblemMarkers';
 
 export const SESSION_COOKIE_NAME = 'sessionId'
 
@@ -46,7 +48,7 @@ export async function resolveLoggedInUserId(): Promise<number> {
     const loginStatus = await resolveLoginStatus()
 
     if (!loginStatus.isLoggedIn) {
-        throw Error('No user is logged in')
+        throw new ProducedProblemRelayError(CommonProblemMarkers.GgSrv.UserAuth.NO_USER_IS_LOGGED_IN)
     }
 
     return loginStatus.userId!

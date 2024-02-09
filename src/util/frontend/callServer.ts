@@ -2,6 +2,23 @@ import axios, {AxiosPromise, AxiosRequestConfig} from 'axios';
 import {parseReceivedProblemRelayResponse} from '@/util/both/problemRelay/responseParser/HttpResponseParsers';
 import ReceivedProblemRelayError from '@/util/both/problemRelay/error/ReceivedProblemRelayError';
 import ApiCallerResponseCodeIsNotSuccessError, {SerializableHttpResponse} from '@/error/ApiCallerResponseCodeIsNotSuccessError';
+import CommonProblemMarkers from '@/util/both/problemRelay/CommonProblemMarkers';
+
+class UserLoginStatusEventBus {
+
+    private sessionExpiredSubscriber: (() => void) | null = null
+
+    setSessionExpiredSubscriber(eventHandler: () => void) {
+        this.sessionExpiredSubscriber = eventHandler
+    }
+
+    fireSessionExpiredEvent() {
+        this.sessionExpiredSubscriber?.()
+    }
+}
+
+export const userLoginStatusEventBus = new UserLoginStatusEventBus()
+
 
 const callServer = <ReturnType>(
     axiosRequestConfig: AxiosRequestConfig,
@@ -38,6 +55,11 @@ const callServer = <ReturnType>(
             const parsedReceivedProblem = parseReceivedProblemRelayResponse(response.status, response.headers, response.data);
             if (parsedReceivedProblem) {
                 console.info(`Received a ProblemRelay in callServer when calling ${calledEndpointText}`, parsedReceivedProblem);
+
+                if (CommonProblemMarkers.GgSrv.UserAuth.NO_USER_IS_LOGGED_IN.matches(parsedReceivedProblem)) {
+                    userLoginStatusEventBus.fireSessionExpiredEvent()
+                }
+
                 throw new ReceivedProblemRelayError(parsedReceivedProblem);
             }
 

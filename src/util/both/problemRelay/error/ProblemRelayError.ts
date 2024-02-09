@@ -7,9 +7,9 @@ export default class ProblemRelayError extends Error {
   payload: any;
 
   constructor(
-    marker: ProblemMarker,
-    payload: any | null,
-    message: string | null,
+      marker: ProblemMarker,
+      payload: any | null,
+      message?: string | null,
   ) {
     super(message as string);
 

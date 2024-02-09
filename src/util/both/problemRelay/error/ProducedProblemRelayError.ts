@@ -3,13 +3,13 @@ import ProblemRelayError from "./ProblemRelayError";
 
 export default class ProducedProblemRelayError extends ProblemRelayError {
 
-  suggestedHttpResponseCode: number | null;
+  suggestedHttpResponseCode?: number | null;
 
   constructor(
       marker: ProblemMarker,
-      payload: any | null,
-      message: string | null,
-      suggestedHttpResponseCode: number | null,
+      payload?: any | null,
+      message?: string | null,
+      suggestedHttpResponseCode?: number | null,
   ) {
     super(
       marker,

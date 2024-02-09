@@ -173,7 +173,7 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
             <Divider/>
             <List>
                 <BasicRouterPushingMenuItem text="Settings" icon={<SettingsOutlinedIcon/>} href="/settings"/>
-                <BasicMenuItem text="Log out" icon={<LogoutOutlinedIcon/>} action={() => alert('TODO: log out')}/>
+                <BasicMenuItem text="Log out" icon={<LogoutOutlinedIcon/>} action={() => alert('TODO: logout is not yet implemented')}/>
             </List>
             <Divider/>
             <List>
