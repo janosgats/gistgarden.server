@@ -157,6 +157,7 @@ const NewTopicAdder: FC<NewTopicAdderProps> = (props) => {
             data: {
                 groupId: props.groupId,
                 topicDescription: newTopicDescription,
+                isPrivate: false,//TODO: add option for creating private topics
             },
         })
             .catch(() => {

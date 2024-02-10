@@ -20,6 +20,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
                     initiatorUserId: loggedInUserId,
                     groupId: request.body.groupId,
                     topicDescription: request.body.topicDescription,
+                    isPrivate: request.body.isPrivate,
                 },
             })
 
