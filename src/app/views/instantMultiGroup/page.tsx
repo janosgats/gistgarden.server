@@ -59,32 +59,19 @@ export default function Home() {
 
 
             <Stack spacing={3}>
+                {groupIdsToDisplay.map(groupId => (
+                    <Paper key={groupId} variant="elevation" elevation={6} sx={{padding: 2}}>
+                        <GroupTopicsDisplay groupId={groupId} displayAsStandalone={false}/>
+                    </Paper>
+                ))}
 
                 <Paper variant="elevation" elevation={6} sx={{padding: 2}}>
                     <ChangeDisplayedGroupsPanel
                         currentGroupIdsToDisplay={groupIdsToDisplay}
                         onAddNewGroup={(newGroupId) => addNewGroupIdToDisplay(newGroupId)}
                         onRemoveGroup={(groupIdToRemove) => removeGroupIdToDisplay(groupIdToRemove)}
-
                     />
                 </Paper>
-
-                {groupIdsToDisplay.map(groupId => (
-                    <Paper key={groupId} variant="elevation" elevation={6} sx={{padding: 2}}>
-                        <GroupTopicsDisplay groupId={groupId} hideViewTogetherLink colorAddNewTopicButtonAsSecondary/>
-                    </Paper>
-                ))}
-
-                {groupIdsToDisplay.length > 1 && (
-                    <Paper variant="elevation" elevation={6} sx={{padding: 2}}>
-                        <ChangeDisplayedGroupsPanel
-                            currentGroupIdsToDisplay={groupIdsToDisplay}
-                            onAddNewGroup={(newGroupId) => addNewGroupIdToDisplay(newGroupId)}
-                            onRemoveGroup={(groupIdToRemove) => removeGroupIdToDisplay(groupIdToRemove)}
-
-                        />
-                    </Paper>
-                )}
             </Stack>
         </>
     )
@@ -120,10 +107,11 @@ const ChangeDisplayedGroupsPanel: FC<AddGroupToViewPanelProps> = (props) => {
         {isAutocompleteOpen || (
             <Tooltip title={`Add or remove groups to display in this view`}>
                 <Button variant="outlined"
+                        color="secondary"
                         fullWidth
                         onClick={() => setIsAutocompleteOpen(true)}
                         startIcon={<DisplaySettingsOutlinedIcon/>}>
-                    Change displayed groups
+                    Display other groups too
                 </Button>
             </Tooltip>
         )}

@@ -11,11 +11,11 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import {RenamerDialog} from '@/react/components/RenamerDialog';
 import {SimpleTopicResponse} from '@/magicRouter/routes/topicRoutes';
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 
 interface Props {
     groupId: number
-    hideViewTogetherLink?: boolean
-    colorAddNewTopicButtonAsSecondary?: boolean
+    displayAsStandalone: boolean
 }
 
 export const GroupTopicsDisplay: FC<Props> = (props) => {
@@ -66,11 +66,21 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                     <Typography variant="h4">
                         {usedGroup.data?.name}
                     </Typography>
-                    <Tooltip title="Rename group">
-                        <IconButton onClick={() => setIsGroupRenamerOpen(true)}>
-                            <DriveFileRenameOutlineOutlinedIcon/>
-                        </IconButton>
-                    </Tooltip>
+                    {props.displayAsStandalone ? (
+                        <Tooltip title="Rename group">
+                            <IconButton onClick={() => setIsGroupRenamerOpen(true)}>
+                                <DriveFileRenameOutlineOutlinedIcon/>
+                            </IconButton>
+                        </Tooltip>
+                    ) : (
+                        <Tooltip title="Open this Group Standalone">
+                            <Link href={`/group/${props.groupId}`} style={{textDecoration: 'none', color: 'inherit'}}>
+                                <IconButton color="secondary">
+                                    <OpenInNewOutlinedIcon/>
+                                </IconButton>
+                            </Link>
+                        </Tooltip>
+                    )}
                 </Stack>
             </UsedEndpointSuspense>
 
@@ -86,7 +96,7 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
             />
 
 
-            {!props.hideViewTogetherLink && (
+            {props.displayAsStandalone && (
                 <Tooltip title="Open a page to display topics from multiple groups next to each other">
                     <Link href={`/views/instantMultiGroup?groups=${props.groupId}`} style={{textDecoration: 'none', color: 'inherit'}}>
                         <Button size="small" variant="text" color="primary" startIcon={<JoinFullOutlinedIcon/>}>
@@ -104,7 +114,7 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                     {!isNewTopicAdderOpen && (
                         <Button
                             variant="outlined"
-                            color={props.colorAddNewTopicButtonAsSecondary ? 'secondary' : 'primary'}
+                            color="primary"
                             onClick={() => setIsNewTopicAdderOpen(true)}
                             startIcon={<AddOutlinedIcon/>}>
                             Add new topic

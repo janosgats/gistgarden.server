@@ -13,7 +13,7 @@ export default function Page() {
 
     return (
         <>
-            <GroupTopicsDisplay groupId={groupId}/>
+            <GroupTopicsDisplay groupId={groupId} displayAsStandalone={true}/>
         </>
     )
 }

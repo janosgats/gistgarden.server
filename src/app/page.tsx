@@ -99,7 +99,7 @@ export default function Home() {
                                     {usedBelongingGroups.data?.map((group, index) => (
                                         <div key={group.id}>
                                             {index > 0 && <Divider variant="middle" component="li"/>}
-                                            <Link href={`/group/${group.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
+                                            <Link href={`/views/instantMultiGroup?groups=${group.id}`} style={{textDecoration: 'none', color: 'inherit'}}>
                                                 <ListItemButton alignItems="flex-start" disableRipple>
                                                     <ListItemAvatar>
                                                         <Avatar sx={{bgcolor: getAvatarBackgroundColor(group.id)}}>
