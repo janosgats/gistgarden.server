@@ -1,5 +1,5 @@
 import React, {FC, useState} from "react";
-import {Button, Card, CardActions, CardContent, IconButton, InputAdornment, TextField, Tooltip, Typography} from '@mui/material';
+import {Button, Card, CardActions, CardContent, Checkbox, FormControlLabel, IconButton, InputAdornment, TextField, Tooltip, Typography} from '@mui/material';
 import callServer from '@/util/frontend/callServer';
 import Grid from '@mui/system/Unstable_Grid';
 import {LoginByPasswordResponse} from '@/magicRouter/routes/userAuthRoutes';
@@ -12,6 +12,7 @@ interface Props {
 
 export const LoginPrompt: FC<Props> = (props) => {
     const [isLoginPromisePending, setIsLoginPromisePending] = useState<boolean>(false)
+    const [keepMeLoggedIn, setKeepMeLoggedIn] = useState<boolean>(false)
     const [showPassword, setShowPassword] = useState<boolean>(false)
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
@@ -26,6 +27,7 @@ export const LoginPrompt: FC<Props> = (props) => {
             data: {
                 email: email,
                 password: password,
+                keepMeLoggedIn: keepMeLoggedIn,
             },
         })
             .then((res) => {
@@ -49,7 +51,7 @@ export const LoginPrompt: FC<Props> = (props) => {
             <Grid>
                 <Card>
                     <CardContent>
-                        <Typography>Log in pls</Typography>
+                        <Typography variant="h5">Log in pls</Typography>
 
                         <TextField
                             variant="standard"
@@ -80,6 +82,14 @@ export const LoginPrompt: FC<Props> = (props) => {
                                     </InputAdornment>
                                 ),
                             }}
+                        />
+
+                        <FormControlLabel
+                            control={
+                                <Checkbox checked={keepMeLoggedIn} onChange={e => setKeepMeLoggedIn(prev => !prev)}/>
+                            }
+                            label="Keep me logged in"
+                            sx={{marginTop: 1, marginBottom: -2}}
                         />
                     </CardContent>
                     <CardActions>

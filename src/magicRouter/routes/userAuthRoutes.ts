@@ -2,18 +2,23 @@ import {MagicRouter, SimpleJsonRequest, SimpleJsonResponse} from "@/magicRouter/
 import {resolveLoginStatus, SESSION_COOKIE_NAME} from "@/util/backend/resolveLoginStatus";
 import callUpstream from "@/util/backend/callUpstream";
 import appConfig from "@/config/appConfig";
+import {getSanitizedBoolean} from '@/util/both/CommonValidators';
 
 
 const PATH_PREFIX_USER_AUTH = '/api/userAuth'
+
 
 const DAY_AS_HOURS = 24
 const HOUR_AS_SECONDS = 3600
 const SECOND_AS_MILLIS = 1000
 
+const DAY_AS_MILLIS = DAY_AS_HOURS * HOUR_AS_SECONDS * SECOND_AS_MILLIS
+
 export function setUserAuthRoutes(magicRouter: MagicRouter) {
 
     magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_USER_AUTH + '/loginByPassword',
         async (request: SimpleJsonRequest): Promise<SimpleJsonResponse<LoginByPasswordResponse>> => {
+            const keepMeLoggedIn = getSanitizedBoolean(request.body.keepMeLoggedIn)
 
             const createSessionResponse = await callUpstream<CreateSessionUpstreamResponse>({
                 baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
@@ -22,6 +27,7 @@ export function setUserAuthRoutes(magicRouter: MagicRouter) {
                 data: {
                     email: request.body.email,
                     password: request.body.password,
+                    keepMeLoggedIn: keepMeLoggedIn,
                 },
             })
 
@@ -33,15 +39,24 @@ export function setUserAuthRoutes(magicRouter: MagicRouter) {
                 }
             }
 
+            function calculateExpiryDirectives(): string {
+                if (!keepMeLoggedIn) {
+                    return "";
+                }
+
+                const timestampOfExpiry = new Date().getTime() + (365 * DAY_AS_MILLIS)
+                const expirationString = new Date(timestampOfExpiry).toUTCString()
+
+                return ` expires='${expirationString}'; `
+            }
+
             const secureDirectives = appConfig.useSecureDirectiveWhenSettingSessionCookie ? ' secure; ' : ' '
-            const timestampOfExpiry = new Date().getTime() + (4 * DAY_AS_HOURS * HOUR_AS_SECONDS * SECOND_AS_MILLIS)
-            const expirationString = new Date(timestampOfExpiry).toUTCString()
             return {
                 body: {
                     areCredentialsValid: createSessionResponse.data.areCredentialsValid,
                 },
                 headers: {
-                    'Set-Cookie': `${SESSION_COOKIE_NAME}=${createSessionResponse.data.sessionId}; expires='${expirationString}'; path=/; ` +
+                    'Set-Cookie': `${SESSION_COOKIE_NAME}=${createSessionResponse.data.sessionId}; ${calculateExpiryDirectives()} path=/; ` +
                         `${secureDirectives} samesite=strict; HttpOnly`,
                 },
             }

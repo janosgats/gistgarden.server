@@ -9,3 +9,15 @@ export function isValidNonNegativeNumber(toValidate: number | string): boolean {
 export function isValidNonEmptyString(toValidate: string): boolean {
     return typeof toValidate === "string" && toValidate.length > 0;
 }
+
+export function getSanitizedBoolean(toValidate: string | boolean): boolean {
+    if (toValidate === true || toValidate === "true") {
+        return true
+    }
+
+    if (toValidate === false || toValidate === "false") {
+        return false
+    }
+
+    throw Error(`Invalid value given for boolean: ${toValidate}`)
+}
