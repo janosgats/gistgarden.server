@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
 import callServer from '@/util/frontend/callServer';
-import {Button, Checkbox, CircularProgress, IconButton, Stack, TextField, Tooltip, Typography} from '@mui/material';
+import {Button, Checkbox, CircularProgress, IconButton, keyframes, Stack, TextField, Tooltip, Typography} from '@mui/material';
 import {UsedEndpointSuspense} from '@/react/components/UsedEndpointSuspense';
 import Link from 'next/link';
 import JoinFullOutlinedIcon from '@mui/icons-material/JoinFullOutlined';
@@ -12,6 +12,8 @@ import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRen
 import {RenamerDialog} from '@/react/components/RenamerDialog';
 import {SimpleTopicResponse} from '@/magicRouter/routes/topicRoutes';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
+import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface Props {
     groupId: number
@@ -153,10 +155,16 @@ interface NewTopicAdderProps {
     afterNewTopicSaved: () => void
 }
 
+const blinkKeyframes = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
 const NewTopicAdder: FC<NewTopicAdderProps> = (props) => {
     const [newTopicDescription, setNewTopicDescription] = useState<string>('')
+    const [isBlinkAnimationOnAdderControlsEnabled, setIsBlinkAnimationOnAdderControlsEnabled] = useState<boolean>(false)
 
-    async function saveNewTopic() {
+    async function saveNewTopic(isPrivate: boolean) {
         if (!newTopicDescription) {
             return
         }
@@ -167,7 +175,7 @@ const NewTopicAdder: FC<NewTopicAdderProps> = (props) => {
             data: {
                 groupId: props.groupId,
                 topicDescription: newTopicDescription,
-                isPrivate: false,//TODO: add option for creating private topics
+                isPrivate: isPrivate,
             },
         })
             .catch(() => {
@@ -193,7 +201,36 @@ const NewTopicAdder: FC<NewTopicAdderProps> = (props) => {
             autoFocus
             value={newTopicDescription}
             onChange={e => setNewTopicDescription(e.target.value)}
-            onBlur={() => saveNewTopic()}
+            onBlur={() => setIsBlinkAnimationOnAdderControlsEnabled(true)}
+            onFocus={() => setIsBlinkAnimationOnAdderControlsEnabled(false)}
+            InputProps={{
+                endAdornment: <Stack
+                    direction="row"
+                    sx={{
+                        animation: isBlinkAnimationOnAdderControlsEnabled ? `${blinkKeyframes} 1s linear ` : undefined,
+                    }}
+                >
+                    <Tooltip title="Add as Private (Only visible for You)">
+                        <IconButton
+                            sx={{display: 'flex', flexDirection: 'column', color: "red"}}
+                            onClick={() => saveNewTopic(true)}
+                            disabled={!newTopicDescription}
+                        >
+                            <LockOutlinedIcon/>
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Add as Public (Visible to all Group Members)">
+                        <IconButton
+                            color="primary"
+                            sx={{display: 'flex', flexDirection: 'column'}}
+                            onClick={() => saveNewTopic(false)}
+                            disabled={!newTopicDescription}
+                        >
+                            <LockOpenOutlinedIcon/>
+                        </IconButton>
+                    </Tooltip>
+                </Stack>,
+            }}
         />
     </Stack>)
 }

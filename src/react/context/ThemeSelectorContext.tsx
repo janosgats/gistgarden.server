@@ -1,5 +1,6 @@
 import React, {createContext, FC, ReactNode, useEffect, useState} from 'react';
 import {createTheme, ThemeProvider} from '@mui/material';
+import "@/react/theme/augmentedTheme"
 
 export enum ThemeOption {
     DARK = 1,
@@ -42,6 +43,10 @@ export const ThemeSelectorContextProvider: FC<{ children: ReactNode }> = ({child
             secondary: {
                 main: '#90caf9',
             },
+            accessControl: {
+                green: '#48ff00',
+                red: 'red',
+            },
         },
     });
 
@@ -53,6 +58,10 @@ export const ThemeSelectorContextProvider: FC<{ children: ReactNode }> = ({child
             },
             secondary: {
                 main: '#90caf9',
+            },
+            accessControl: {
+                green: '#48ff00',
+                red: 'red',
             },
         },
     });

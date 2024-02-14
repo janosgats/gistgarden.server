@@ -114,6 +114,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
 export interface SimpleTopicResponse {
     id: number;
     isDone: boolean;
+    isPrivate: boolean;
     description: string;
     creatorUserId: number;
 }

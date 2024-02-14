@@ -9,6 +9,9 @@ import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined
 import DragIndicatorOutlinedIcon from '@mui/icons-material/DragIndicatorOutlined';
 import {SimpleTopicResponse} from '@/magicRouter/routes/topicRoutes';
 import {useCurrentUserContext} from '@/react/context/CurrentUserContext';
+import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import "@/react/theme/augmentedTheme"
 
 interface Props {
     initialTopic: SimpleTopicResponse,
@@ -134,6 +137,17 @@ export const Topic: FC<Props> = (props) => {
         )}
         {saveNewDescriptionCallStatus === CallStatus.FAILED && <span>Error while saving <button onClick={() => saveNewDescriptionIfChanged()}>Retry</button></span>}
 
+        <Stack>
+            <Tooltip title={`${lastSavedTopicState.isPrivate ? 'Only visible for You' : 'Visible for all Group Members'} (Click to toggle)`}>
+                <IconButton onClick={() => alert('TODO: implement privacy toggle')}>
+                    {lastSavedTopicState.isPrivate ? (
+                        <LockOutlinedIcon sx={theme => ({color: theme.palette.accessControl.red})}/>
+                    ) : (
+                        <LockOpenOutlinedIcon sx={theme => ({color: theme.palette.accessControl.green})}></LockOpenOutlinedIcon>
+                    )}
+                </IconButton>
+            </Tooltip>
+        </Stack>
         <Stack>
             <Tooltip title="Archive">
                 <IconButton onClick={() => alert('TODO: implement archival')}>
