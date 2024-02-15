@@ -27,6 +27,7 @@ export const Topic: FC<Props> = (props) => {
     const [saveNewDescriptionCallStatus, setSaveNewDescriptionCallStatus] = useState<CallStatus>(CallStatus.OPEN)
     const [didLastSaveFinishInTheNearPast, setDidLastSaveFinishInTheNearPast] = useState<boolean>(false)
     const [toggleIsDoneStateCallStatus, setToggleIsDoneStateCallStatus] = useState<CallStatus>(CallStatus.OPEN)
+    const [toggleIsPrivateStateCallStatus, setToggleIsPrivateStateCallStatus] = useState<CallStatus>(CallStatus.OPEN)
 
 
     async function saveNewDescriptionIfChanged() {
@@ -78,6 +79,33 @@ export const Topic: FC<Props> = (props) => {
             })
             .catch(() => {
                 setToggleIsDoneStateCallStatus(CallStatus.FAILED)
+            })
+    }
+
+    async function toggleIsPrivateState() {
+        const newIsPrivate = !lastSavedTopicState.isPrivate
+
+        if (!newIsPrivate && !confirm("Are you sure you want to make this topic public? Every member of this group will see it.")) {
+            return
+        }
+
+        setToggleIsPrivateStateCallStatus(CallStatus.PENDING)
+
+        callServer({
+            url: '/api/topic/setIsPrivateState',
+            method: 'POST',
+            data: {
+                topicId: props.initialTopic.id,
+                newIsPrivate: newIsPrivate,
+            },
+        })
+            .then(() => {
+                setToggleIsPrivateStateCallStatus(CallStatus.SUCCEEDED)
+                setLastSavedTopicState((prevState) => ({...prevState, isPrivate: newIsPrivate}))
+            })
+            .catch(() => {
+                setToggleIsPrivateStateCallStatus(CallStatus.FAILED)
+                alert('Error while toggling privacy setting of topic')
             })
     }
 
@@ -139,11 +167,15 @@ export const Topic: FC<Props> = (props) => {
 
         <Stack>
             <Tooltip title={`${lastSavedTopicState.isPrivate ? 'Only visible for You' : 'Visible for all Group Members'} (Click to toggle)`}>
-                <IconButton onClick={() => alert('TODO: implement privacy toggle')}>
+                <IconButton
+                    onClick={() => toggleIsPrivateState()}
+                    disabled={toggleIsPrivateStateCallStatus === CallStatus.PENDING}
+                    sx={theme => ({color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green})}
+                >
                     {lastSavedTopicState.isPrivate ? (
-                        <LockOutlinedIcon sx={theme => ({color: theme.palette.accessControl.red})}/>
+                        <LockOutlinedIcon/>
                     ) : (
-                        <LockOpenOutlinedIcon sx={theme => ({color: theme.palette.accessControl.green})}></LockOpenOutlinedIcon>
+                        <LockOpenOutlinedIcon></LockOpenOutlinedIcon>
                     )}
                 </IconButton>
             </Tooltip>

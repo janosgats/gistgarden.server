@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
 import callServer from '@/util/frontend/callServer';
-import {Button, Checkbox, CircularProgress, IconButton, keyframes, Stack, TextField, Tooltip, Typography} from '@mui/material';
+import {Button, CircularProgress, IconButton, keyframes, Stack, TextField, Tooltip, Typography} from '@mui/material';
 import {UsedEndpointSuspense} from '@/react/components/UsedEndpointSuspense';
 import Link from 'next/link';
 import JoinFullOutlinedIcon from '@mui/icons-material/JoinFullOutlined';
@@ -187,12 +187,8 @@ const NewTopicAdder: FC<NewTopicAdderProps> = (props) => {
             })
     }
 
-    return (<Stack direction="row">
-        <Checkbox
-            color="secondary"
-            checked={false}
-            disabled
-        />
+    return (<Stack direction="row" alignItems="center">
+        <AddOutlinedIcon sx={{marginRight: 1}}/>
         <TextField
             variant="standard"
             multiline
