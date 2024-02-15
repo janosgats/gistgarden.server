@@ -24,6 +24,7 @@ export default function Home() {
                     <li>basic &quot;Search for anything&quot; interface</li>
                     <li>AI LLM based indexing and LLM search in topics</li>
                 </ul>
+                <li>comments on topics</li>
                 <Done>adding a random topic: Quick Add</Done>
                 <Done>viewing topics together: Views</Done>
                 <ul>
@@ -38,8 +39,8 @@ export default function Home() {
                 </ul>
                 <li>private topics for a set of people during conversation</li>
                 <ul>
-                    <li>private topics (only visible for you)</li>
-                    <li>use Views or use &quot;view together with&quot; feature on top of a group&apos;s page</li>
+                    <Done>private topics (only visible for you)</Done>
+                    <Done>use Views or use &quot;view together with&quot; feature on top of a group&apos;s page</Done>
                     <li>Topic linking</li>
                 </ul>
                 <li>reorder topics</li>

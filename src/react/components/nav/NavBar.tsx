@@ -12,6 +12,8 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import Brightness4OutlinedIcon from '@mui/icons-material/Brightness4Outlined';
 import {ThemeOption, ThemeSelectorContext} from '@/react/context/ThemeSelectorContext';
 import GrassIcon from '@mui/icons-material/Grass';
+import callServer from '@/util/frontend/callServer';
+import {CurrentUserContext} from '@/react/context/CurrentUserContext';
 
 interface Props {
     drawerWidth: number
@@ -109,6 +111,7 @@ interface DrawerContentProps {
 const DrawerContent: FC<DrawerContentProps> = (props) => {
     const router = useRouter()
     const themeSelectorContext = useContext(ThemeSelectorContext)
+    const currentUser = useContext(CurrentUserContext)
 
     function handleMenuItemClick(action: () => void) {
         props.onItemClicked()
@@ -117,6 +120,19 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
 
     function handleRouterPushingMenuItemClick(href: string) {
         handleMenuItemClick(() => router.push(href))
+    }
+
+    function handleLogoutClicked() {
+        callServer({
+            url: '/api/userAuth/logOut',
+            method: 'POST',
+        })
+            .then(() => {
+                currentUser.reload()
+            })
+            .catch(() => {
+                alert('Error while logging out! You\'re probably still logged in. Please try again')
+            })
     }
 
 
@@ -173,7 +189,7 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
             <Divider/>
             <List>
                 <BasicRouterPushingMenuItem text="Settings" icon={<SettingsOutlinedIcon/>} href="/settings"/>
-                <BasicMenuItem text="Log out" icon={<LogoutOutlinedIcon/>} action={() => alert('TODO: logout is not yet implemented')}/>
+                <BasicMenuItem text="Log out" icon={<LogoutOutlinedIcon/>} action={() => handleLogoutClicked()}/>
             </List>
             <Divider/>
             <List>

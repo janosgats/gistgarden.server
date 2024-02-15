@@ -63,6 +63,17 @@ export function setUserAuthRoutes(magicRouter: MagicRouter) {
         },
     )
 
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_USER_AUTH + '/logOut',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            return {
+                headers: {
+                    'Set-Cookie': `${SESSION_COOKIE_NAME}=logged_out; expires='${new Date(0).toUTCString()}'; path=/; samesite=strict; HttpOnly`,
+                },
+            }
+        },
+        {skipReadingBody: true},
+    )
+
     magicRouter.setSimpleJsonHandler('GET', PATH_PREFIX_USER_AUTH + '/loginStatus',
         async (request: SimpleJsonRequest): Promise<SimpleJsonResponse<CurrentUserInfo>> => {
             const loginStatus = await resolveLoginStatus()
