@@ -1,6 +1,6 @@
 import React, {FC, useState} from "react";
 import callServer from "@/util/frontend/callServer";
-import {Avatar, Checkbox, CircularProgress, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
+import {Avatar, Checkbox, CircularProgress, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, TextField, Tooltip, useTheme} from '@mui/material';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import {ProgressColors} from '@/react/res/ProgressColors';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
@@ -20,7 +20,9 @@ interface Props {
 }
 
 export const Topic: FC<Props> = (props) => {
+    const theme = useTheme();
     const currentUserContext = useCurrentUserContext()
+
 
     const [lastSavedTopicState, setLastSavedTopicState] = useState<SimpleTopicResponse>(props.initialTopic)
     const [description, setDescription] = useState<string>(props.initialTopic.description)
@@ -129,7 +131,7 @@ export const Topic: FC<Props> = (props) => {
     return (<Stack direction="row">
         <Stack>
             <Tooltip title="Drag to reorder">
-                <IconButton sx={{paddingLeft: 0, paddingRight: 0, color: lastSavedTopicState.isPrivate ? 'red' : undefined}}>
+                <IconButton sx={{paddingLeft: 0, paddingRight: 0}}>
                     <DragIndicatorOutlinedIcon/>
                 </IconButton>
             </Tooltip>
@@ -140,13 +142,12 @@ export const Topic: FC<Props> = (props) => {
             ) : (
                 <Checkbox
                     color="secondary"
-                    sx={theme => ({
+                    sx={{
                         color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : 'secondary',
                         '&.Mui-checked': {
                             color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : 'secondary',
                         },
-                    })
-                    }
+                    }}
                     checked={lastSavedTopicState.isDone}
                     onChange={() => usedToggleIsDone.run()}
                 />
@@ -174,6 +175,13 @@ export const Topic: FC<Props> = (props) => {
                         },
                     },
                 }),
+                ...(lastSavedTopicState.isPrivate ? {
+                    endAdornment: (
+                        <Tooltip title={'Private topic. Only visible for You'}>
+                            <LockOutlinedIcon sx={{color: theme.palette.accessControl.red}}/>
+                        </Tooltip>
+                    ),
+                } : {}),
             }}
         />
 
@@ -186,6 +194,7 @@ export const Topic: FC<Props> = (props) => {
         )}
         {usedSaveNewDescriptionIfChanged.failed && <span>Error while saving <button onClick={() => usedSaveNewDescriptionIfChanged.run()}>Retry</button></span>}
 
+
         <Stack
             direction="row"
             sx={theme => ({
@@ -194,21 +203,6 @@ export const Topic: FC<Props> = (props) => {
                 },
             })}
         >
-            <Stack>
-                <Tooltip title={`${lastSavedTopicState.isPrivate ? 'Only visible for You' : 'Visible for all Group Members'} (Click to toggle)`}>
-                    <IconButton
-                        onClick={() => usedToggleIsPrivate.run()}
-                        disabled={usedToggleIsPrivate.pending}
-                        sx={theme => ({color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green})}
-                    >
-                        {lastSavedTopicState.isPrivate ? (
-                            <LockOutlinedIcon/>
-                        ) : (
-                            <LockOpenOutlinedIcon/>
-                        )}
-                    </IconButton>
-                </Tooltip>
-            </Stack>
             <Stack>
                 <Tooltip title="Archive">
                     <IconButton onClick={() => alert('TODO: implement archival')}>
@@ -219,9 +213,11 @@ export const Topic: FC<Props> = (props) => {
         </Stack>
 
         <Stack>
-            <IconButton onClick={e => setMoreMenuAnchorElement(e.currentTarget)} sx={{color: lastSavedTopicState.isPrivate ? 'red' : undefined}}>
-                <MoreVertOutlinedIcon/>
-            </IconButton>
+            <Tooltip title="Click for More">
+                <IconButton onClick={e => setMoreMenuAnchorElement(e.currentTarget)}>
+                    <MoreVertOutlinedIcon/>
+                </IconButton>
+            </Tooltip>
         </Stack>
 
         <Menu
@@ -233,14 +229,8 @@ export const Topic: FC<Props> = (props) => {
             <MenuItem
                 onClick={() => usedToggleIsPrivate.run().then(() => setMoreMenuAnchorElement(null))}
                 disabled={usedToggleIsPrivate.pending}
-
-                sx={theme => ({
-                    [theme.breakpoints.up('md')]: {
-                        display: 'none',
-                    },
-                })}
             >
-                <ListItemIcon sx={theme => ({color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green})}>
+                <ListItemIcon sx={{color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green}}>
                     {lastSavedTopicState.isPrivate ? (
                         <LockOutlinedIcon/>
                     ) : (
@@ -252,11 +242,11 @@ export const Topic: FC<Props> = (props) => {
 
             <MenuItem
                 onClick={() => alert('TODO: implement archival')}
-                sx={theme => ({
+                sx={{
                     [theme.breakpoints.up('md')]: {
                         display: 'none',
                     },
-                })}
+                }}
             >
                 <ListItemIcon sx={{color: "orange"}}>
                     <ArchiveOutlinedIcon/>
