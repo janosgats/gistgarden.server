@@ -23,6 +23,7 @@ interface Props {
 export const GroupTopicsDisplay: FC<Props> = (props) => {
     const [isNewTopicAdderOpen, setIsNewTopicAdderOpen] = useState<boolean>(false)
     const [isGroupRenamerOpen, setIsGroupRenamerOpen] = useState<boolean>(false)
+    const [displayedTopics, setDisplayedTopics] = useState<SimpleTopicResponse[] | null>(null)
 
     const usedGroup = useEndpoint<SimpleGroupResponse>({
         config: {
@@ -43,23 +44,14 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                 groupId: props.groupId,
             },
         },
+        customSuccessProcessor: (axiosResponse) => {
+            setDisplayedTopics(axiosResponse.data)
+            return axiosResponse.data
+        },
+        onError: () => {
+            setDisplayedTopics(null)
+        },
     })
-
-    async function handleTopicDeletion(topicId: number) {
-        await callServer({
-            url: '/api/topic/deleteTopic',
-            method: "DELETE",
-            data: {
-                topicId: topicId,
-            },
-        })
-            .catch(() => {
-                alert('Error while deleting topic')
-            })
-            .finally(() => {
-                usedTopics.reloadEndpoint()
-            })
-    }
 
     return (
         <>
@@ -109,8 +101,17 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
             )}
             <UsedEndpointSuspense usedEndpoint={usedTopics}>
                 <Stack spacing={2}>
-                    {usedTopics.data?.map(topic => (
-                        <Topic key={topic.id} initialTopic={topic} onDeleteRequest={() => handleTopicDeletion(topic.id)}/>
+                    {displayedTopics?.map(topic => (
+                        <Topic
+                            key={topic.id}
+                            initialTopic={topic}
+                            afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
+                                if (wasDeletionSurelySuccessful) {
+                                    setDisplayedTopics(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
+                                } else {
+                                    usedTopics.reloadEndpoint()
+                                }
+                            }}/>
                     ))}
 
                     {!isNewTopicAdderOpen && (
