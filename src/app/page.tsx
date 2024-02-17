@@ -13,6 +13,8 @@ import {Property} from 'csstype';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import Grid from '@mui/system/Unstable_Grid';
+import {useCurrentUserContext} from '@/react/context/CurrentUserContext';
+import {UserInfoResponse} from '@/magicRouter/routes/userRoutes';
 
 function getFirstLettersOfWords(sentence: string): string {
     if (!sentence) {
@@ -54,6 +56,9 @@ function getAvatarBackgroundColor(groupId: number): Property.Color {
 }
 
 export default function Home() {
+    const currentUserContext = useCurrentUserContext()
+
+    const [isCreateNewGroupDialogOpen, setIsCreateNewGroupDialogOpen] = useState<boolean>(false)
 
     const usedBelongingGroups = useEndpoint<SimpleGroupResponse[]>({
         config: {
@@ -61,31 +66,20 @@ export default function Home() {
         },
     })
 
-
-    async function onLoginClicked() {
-        await callServer({
-            url: '/api/userAuth/login',
-            method: "POST",
-        })
-    }
-
-    async function onGetUserInfoClicked() {
-        const response = await callServer({
+    const usedUserInfo = useEndpoint<UserInfoResponse>({
+        config: {
             url: '/api/user/userInfo',
-        })
-
-        alert(JSON.stringify(response.data))
-    }
-
+        },
+    })
 
     return (
         <>
-            <h1>Valami</h1>
-
-            <Button onClick={() => onLoginClicked()}>Login</Button>
-            <Button onClick={() => onGetUserInfoClicked()}>Get user info</Button>
-            <br/>
-            <CreateGroupPanel afterNewGroupCreationSubmitted={() => usedBelongingGroups.reloadEndpoint()}/>
+            <p>Logged in user:
+                <UsedEndpointSuspense usedEndpoint={usedUserInfo} pendingNode="&nbsp;Loading username...">
+                    &nbsp;{usedUserInfo.data?.nickName}
+                </UsedEndpointSuspense>
+                &nbsp;({currentUserContext.userId})
+            </p>
 
             <Grid container spacing={4} margin={2}>
                 <Grid xs={12} lg="auto">
@@ -130,8 +124,19 @@ export default function Home() {
                             </UsedEndpointSuspense>
                         </CardContent>
                         <CardActions sx={{justifyContent: 'right'}}>
-                            <Button startIcon={<GroupAddIcon/>} variant="outlined" color="secondary">Create new Group</Button>
+                            <Button
+                                startIcon={<GroupAddIcon/>}
+                                variant="outlined"
+                                color="secondary"
+                                onClick={() => setIsCreateNewGroupDialogOpen(true)}
+                            >
+                                Create new Group
+                            </Button>
                         </CardActions>
+
+                        {isCreateNewGroupDialogOpen && (
+                            <CreateGroupPanel afterNewGroupCreationSubmitted={() => usedBelongingGroups.reloadEndpoint()}/>
+                        )}
                     </Card>
                 </Grid>
                 <Grid xs={12} lg={5}>
@@ -185,6 +190,10 @@ const CreateGroupPanel: FC<CreateGroupPanelProps> = (props) => {
             },
         })
             .then(() => setEnteredName(""))
+            .catch((err) => {
+                alert('error while creating group')
+                throw err
+            })
             .finally(() => {
                 props.afterNewGroupCreationSubmitted?.()
             })
@@ -192,7 +201,7 @@ const CreateGroupPanel: FC<CreateGroupPanelProps> = (props) => {
 
     return (<>
         <DevPanel>
-            <input value={enteredName} onChange={e => setEnteredName(e.target.value)}/>
+            <input value={enteredName} onChange={e => setEnteredName(e.target.value)} autoFocus/>
             <button onClick={() => onSubmit()}>Create Group</button>
         </DevPanel>
     </>)

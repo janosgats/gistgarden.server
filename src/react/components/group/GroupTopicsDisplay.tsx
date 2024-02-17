@@ -63,7 +63,7 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
         <>
             <UsedEndpointSuspense usedEndpoint={usedGroup} pendingNode={<Stack><CircularProgress/></Stack>} failedNode={'Error loading group name :/'}>
                 <Stack direction="row">
-                    <Typography variant="h4">
+                    <Typography variant="h4" marginBottom={1}>
                         {usedGroup.data?.name}
                     </Typography>
 
