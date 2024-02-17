@@ -6,7 +6,7 @@ import {Button, CircularProgress, IconButton, keyframes, Stack, TextField, Toolt
 import {UsedEndpointSuspense} from '@/react/components/UsedEndpointSuspense';
 import Link from 'next/link';
 import JoinFullOutlinedIcon from '@mui/icons-material/JoinFullOutlined';
-import {Topic} from '@/react/components/Topic';
+import {Topic} from '@/react/components/topic/Topic';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import {RenamerDialog} from '@/react/components/RenamerDialog';
@@ -23,7 +23,7 @@ interface Props {
 export const GroupTopicsDisplay: FC<Props> = (props) => {
     const [isNewTopicAdderOpen, setIsNewTopicAdderOpen] = useState<boolean>(false)
     const [isGroupRenamerOpen, setIsGroupRenamerOpen] = useState<boolean>(false)
-    const [displayedTopics, setDisplayedTopics] = useState<SimpleTopicResponse[] | null>(null)
+    const [topicsToDisplay, setTopicsToDisplay] = useState<SimpleTopicResponse[] | null>(null)
 
     const usedGroup = useEndpoint<SimpleGroupResponse>({
         config: {
@@ -45,11 +45,11 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
             },
         },
         customSuccessProcessor: (axiosResponse) => {
-            setDisplayedTopics(axiosResponse.data)
+            setTopicsToDisplay(axiosResponse.data)
             return axiosResponse.data
         },
         onError: () => {
-            setDisplayedTopics(null)
+            setTopicsToDisplay(null)
         },
     })
 
@@ -101,13 +101,13 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
             )}
             <UsedEndpointSuspense usedEndpoint={usedTopics}>
                 <Stack spacing={2}>
-                    {displayedTopics?.map(topic => (
+                    {topicsToDisplay?.map(topic => (
                         <Topic
                             key={topic.id}
                             initialTopic={topic}
                             afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
                                 if (wasDeletionSurelySuccessful) {
-                                    setDisplayedTopics(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
+                                    setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
                                 } else {
                                     usedTopics.reloadEndpoint()
                                 }

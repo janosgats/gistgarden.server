@@ -1,11 +1,11 @@
 import React from 'react';
 import {CallStatus} from '@/util/both/CallStatus';
 
-export interface UseActionCommand<R, P> {
+export interface UseActionCommand<P, R> {
     actionFunction: (param: P) => Promise<R>;
 }
 
-export interface UsedAction<R, P> {
+export interface UsedAction<P, R> {
     pending: boolean;
     failed: boolean;
     succeeded: boolean;
@@ -16,9 +16,9 @@ export interface UsedAction<R, P> {
     run: (param: P) => Promise<R>;
 }
 
-const useAction = <R = void, P = void>({
+const useAction = <P = void, R = void>({
                                            actionFunction,
-                                       }: UseActionCommand<R, P>): UsedAction<R, P> => {
+                                       }: UseActionCommand<P, R>): UsedAction<P, R> => {
     const [result, setResult] = React.useState<R | null>(null);
     const [callStatus, setCallStatus] = React.useState<CallStatus>(CallStatus.OPEN);
 

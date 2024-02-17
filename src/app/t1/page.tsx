@@ -24,7 +24,7 @@ export default function Home() {
                     <li>basic &quot;Search for anything&quot; interface</li>
                     <li>AI LLM based indexing and LLM search in topics</li>
                 </ul>
-                <li>comments on topics</li>
+                <Done>comments on topics</Done>
                 <Done>adding a random topic: Quick Add</Done>
                 <Done>viewing topics together: Views</Done>
                 <ul>
@@ -45,7 +45,6 @@ export default function Home() {
                 </ul>
                 <li>reorder topics</li>
                 <li>1:1s</li>
-                <li>take a look at the note-taking app called Obsidian</li>
                 <li>tags</li>
                 <ul>
                     <li>tag based filtering for topics</li>
@@ -54,7 +53,7 @@ export default function Home() {
                 <li>link groups to groups, topics to groups, topics to topics</li>
                 <ul>
                     <li>graph visualization based on the links</li>
-                    <li>?maybe make the tasks markdowns and use those to create links?</li>
+                    <li>?maybe make the tasks&apos; markdowns and use those to create links?</li>
                 </ul>
             </ul>
 
