@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from "react";
 import {CreateGroupResponse, SimpleGroupResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {CallStatus} from "@/util/both/CallStatus";
-import {Autocomplete, Button, Card, CardActions, CardContent, CircularProgress, IconButton, InputAdornment, ListItem, TextField, Tooltip, Typography} from '@mui/material';
+import {Autocomplete, Button, Card, CardActions, CardContent, CircularProgress, IconButton, InputAdornment, ListItem, TextField, Tooltip, Typography, useTheme} from '@mui/material';
 
 import PlusOneOutlinedIcon from '@mui/icons-material/PlusOneOutlined';
 import useEndpoint from '@/react/hooks/useEndpoint';
@@ -12,7 +12,7 @@ import callServer from '@/util/frontend/callServer';
 
 interface Props {
     onAddToGroupClicked: (groupId: number) => Promise<void>
-
+    isTopicSetToBePrivate: boolean
     closeDialog: () => void
 }
 
@@ -52,7 +52,11 @@ export const AddToGroupSearcher: FC<Props> = (props) => {
             onInputChange={(e, newInputValue) => setSearchInputText(newInputValue)}
             options={usedBelongingGroups.data || []}
             renderOption={(renderOptionProps, option, state, ownerState) =>
-                <OptionComponent key={option.id} group={option} onAddToGroupClicked={props.onAddToGroupClicked} closeDialog={props.closeDialog}/>
+                <OptionComponent key={option.id}
+                                 group={option}
+                                 onAddToGroupClicked={props.onAddToGroupClicked}
+                                 isTopicSetToBePrivate={props.isTopicSetToBePrivate}
+                                 closeDialog={props.closeDialog}/>
             }
             renderInput={(params) =>
                 <TextField
@@ -95,12 +99,13 @@ export const AddToGroupSearcher: FC<Props> = (props) => {
 
 interface OptionComponentProps {
     onAddToGroupClicked: (groupId: number) => Promise<void>
+    isTopicSetToBePrivate: boolean
     group: SimpleGroupResponse
-
     closeDialog: () => void
 }
 
 const OptionComponent: FC<OptionComponentProps> = (props) => {
+    const theme = useTheme()
     const router = useRouter()
 
     const [addToGroupCallStatus, setAddToGroupCallStatus] = useState<CallStatus>(CallStatus.OPEN)
@@ -125,9 +130,9 @@ const OptionComponent: FC<OptionComponentProps> = (props) => {
                 <CircularProgress color="primary" size="2.5rem" sx={{padding: '0.6rem'}}/>
             )}
             {addToGroupCallStatus !== CallStatus.PENDING && (
-                <Tooltip title="Add topic to this group">
-                    <IconButton onClick={handleAddToGroupClicked}>
-                        <PlusOneOutlinedIcon color="primary"/>
+                <Tooltip title={`Add topic to this group as ${props.isTopicSetToBePrivate ? 'Private' : 'Public'}`}>
+                    <IconButton onClick={handleAddToGroupClicked} sx={{color: props.isTopicSetToBePrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green}}>
+                        <PlusOneOutlinedIcon/>
                     </IconButton>
                 </Tooltip>
             )}
