@@ -11,8 +11,16 @@ interface Props {
 }
 
 const blinkKeyframes = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  21% { opacity: 0; }
+  40% { opacity: 1; }
+  41% { opacity: 0; }
+  60% { opacity: 1; }
+  61% { opacity: 0; }
+  80% { opacity: 1; }
+  81% { opacity: 0; }
+  100% { opacity: 1; }
 `;
 
 export const NewTopicAdder: FC<Props> = (props) => {
@@ -58,7 +66,7 @@ export const NewTopicAdder: FC<Props> = (props) => {
                 endAdornment: <Stack
                     direction="row"
                     sx={{
-                        animation: isBlinkAnimationOnAdderControlsEnabled ? `${blinkKeyframes} 1s linear ` : undefined,
+                        animation: isBlinkAnimationOnAdderControlsEnabled ? `${blinkKeyframes} 2s linear ` : undefined,
                     }}
                 >
                     <Tooltip title="Add as Private (Only visible for You)">
