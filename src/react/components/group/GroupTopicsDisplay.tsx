@@ -16,6 +16,7 @@ import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
+import {GroupMembersEditorDialog} from '@/react/components/group/GroupMembersEditorDialog';
 
 interface Props {
     groupId: number
@@ -25,6 +26,7 @@ interface Props {
 export const GroupTopicsDisplay: FC<Props> = (props) => {
     const [isNewTopicAdderOpen, setIsNewTopicAdderOpen] = useState<boolean>(false)
     const [isGroupRenamerOpen, setIsGroupRenamerOpen] = useState<boolean>(false)
+    const [isGroupMemberEditorOpen, setIsGroupMemberEditorOpen] = useState<boolean>(false)
     const [topicsToDisplay, setTopicsToDisplay] = useState<SimpleTopicResponse[] | null>(null)
 
     const [moreMenuAnchorElement, setMoreMenuAnchorElement] = useState<null | HTMLElement>(null);
@@ -95,7 +97,7 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                         <MenuItem
                             onClick={() => {
                                 setMoreMenuAnchorElement(null)
-                                setIsGroupRenamerOpen(true)
+                                setIsGroupMemberEditorOpen(true)
                             }}
                         >
                             <ListItemIcon>
@@ -109,7 +111,6 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                                 <MenuItem
                                     onClick={() => {
                                         setMoreMenuAnchorElement(null)
-                                        setIsGroupRenamerOpen(true)
                                     }}
                                 >
                                     <ListItemIcon>
@@ -133,6 +134,12 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                     setIsGroupRenamerOpen(false)
                     usedGroup.reloadEndpoint()
                 })}
+            />
+
+            <GroupMembersEditorDialog
+                isOpen={isGroupMemberEditorOpen}
+                onClose={() => setIsGroupMemberEditorOpen(false)}
+                groupId={props.groupId}
             />
 
 

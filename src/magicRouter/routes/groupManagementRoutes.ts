@@ -89,6 +89,67 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
             }
         },
     )
+
+
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/listGroupMembers',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            const upstreamResponse = await callUpstream<SimpleGroupMemberResponse[]>({
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
+                url: '/api/userInitiated/groupManagement/listGroupMembers',
+                method: 'POST',
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    groupId: request.body.groupId,
+                },
+            })
+
+            return {
+                body: upstreamResponse.data,
+            }
+        },
+    )
+
+
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/addMemberToGroup',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            await callUpstream<SimpleGroupMemberResponse[]>({
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
+                url: '/api/userInitiated/groupManagement/addMemberToGroup',
+                method: 'POST',
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    groupId: request.body.groupId,
+                    userIdToAdd: request.body.userIdToAdd,
+                },
+            })
+
+            return {}
+        },
+    )
+
+
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_GROUP_MANAGEMENT + '/removeMemberFromGroup',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            await callUpstream<SimpleGroupMemberResponse[]>({
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
+                url: '/api/userInitiated/groupManagement/removeMemberFromGroup',
+                method: 'POST',
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    groupId: request.body.groupId,
+                    userIdToRemove: request.body.userIdToRemove,
+                },
+            })
+
+            return {}
+        },
+    )
 }
 
 export interface SimpleGroupResponse {
@@ -99,4 +160,8 @@ export interface SimpleGroupResponse {
 export interface CreateGroupResponse {
     groupId: number;
     groupName: string;
+}
+
+export interface SimpleGroupMemberResponse {
+    userId: number
 }
