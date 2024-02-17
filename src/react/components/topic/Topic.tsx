@@ -192,6 +192,9 @@ export const Topic: FC<Props> = (props) => {
                             "&:before": {
                                 borderBottomColor: theme.palette.accessControl.red,
                             },
+                            '&::after': {
+                                borderBottomColor: theme.palette.accessControl.red,
+                            },
                         },
                     }),
                 }}
