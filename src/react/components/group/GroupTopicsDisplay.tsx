@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
 import callServer from '@/util/frontend/callServer';
-import {Button, CircularProgress, IconButton, keyframes, Stack, TextField, Tooltip, Typography} from '@mui/material';
+import {Button, CircularProgress, IconButton, keyframes, ListItemIcon, ListItemText, Menu, MenuItem, Stack, TextField, Tooltip, Typography} from '@mui/material';
 import {UsedEndpointSuspense} from '@/react/components/UsedEndpointSuspense';
 import Link from 'next/link';
 import JoinFullOutlinedIcon from '@mui/icons-material/JoinFullOutlined';
@@ -14,6 +14,8 @@ import {SimpleTopicResponse} from '@/magicRouter/routes/topicRoutes';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 
 interface Props {
     groupId: number
@@ -24,6 +26,8 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
     const [isNewTopicAdderOpen, setIsNewTopicAdderOpen] = useState<boolean>(false)
     const [isGroupRenamerOpen, setIsGroupRenamerOpen] = useState<boolean>(false)
     const [topicsToDisplay, setTopicsToDisplay] = useState<SimpleTopicResponse[] | null>(null)
+
+    const [moreMenuAnchorElement, setMoreMenuAnchorElement] = useState<null | HTMLElement>(null);
 
     const usedGroup = useEndpoint<SimpleGroupResponse>({
         config: {
@@ -60,21 +64,63 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                     <Typography variant="h4">
                         {usedGroup.data?.name}
                     </Typography>
-                    {props.displayAsStandalone ? (
-                        <Tooltip title="Rename group">
-                            <IconButton onClick={() => setIsGroupRenamerOpen(true)}>
-                                <DriveFileRenameOutlineOutlinedIcon/>
+
+
+                    <Stack>
+                        <Tooltip title="Click for More">
+                            <IconButton onClick={e => setMoreMenuAnchorElement(e.currentTarget)}>
+                                <MoreHorizOutlinedIcon/>
                             </IconButton>
                         </Tooltip>
-                    ) : (
-                        <Tooltip title="Open this Group Standalone">
+                    </Stack>
+
+
+                    <Menu
+                        anchorEl={moreMenuAnchorElement}
+                        open={!!moreMenuAnchorElement}
+                        onClose={() => setMoreMenuAnchorElement(null)}
+                    >
+                        <MenuItem
+                            onClick={() => {
+                                setMoreMenuAnchorElement(null)
+                                setIsGroupRenamerOpen(true)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <DriveFileRenameOutlineOutlinedIcon/>
+                            </ListItemIcon>
+                            <ListItemText>Rename Group</ListItemText>
+                        </MenuItem>
+
+                        <MenuItem
+                            onClick={() => {
+                                setMoreMenuAnchorElement(null)
+                                setIsGroupRenamerOpen(true)
+                            }}
+                        >
+                            <ListItemIcon>
+                                <PeopleOutlinedIcon/>
+                            </ListItemIcon>
+                            <ListItemText>Edit Members</ListItemText>
+                        </MenuItem>
+
+                        {!props.displayAsStandalone && (
                             <Link href={`/group/${props.groupId}`} style={{textDecoration: 'none', color: 'inherit'}}>
-                                <IconButton color="secondary">
-                                    <OpenInNewOutlinedIcon/>
-                                </IconButton>
+                                <MenuItem
+                                    onClick={() => {
+                                        setMoreMenuAnchorElement(null)
+                                        setIsGroupRenamerOpen(true)
+                                    }}
+                                >
+                                    <ListItemIcon>
+                                        <OpenInNewOutlinedIcon color="secondary"/>
+                                    </ListItemIcon>
+                                    <ListItemText>Open this Group Standalone</ListItemText>
+                                </MenuItem>
                             </Link>
-                        </Tooltip>
-                    )}
+                        )}
+                    </Menu>
+
                 </Stack>
             </UsedEndpointSuspense>
 

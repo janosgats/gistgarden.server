@@ -240,7 +240,6 @@ export const Topic: FC<Props> = (props) => {
             </Stack>
 
             <Menu
-                id="basic-menu"
                 anchorEl={moreMenuAnchorElement}
                 open={!!moreMenuAnchorElement}
                 onClose={() => setMoreMenuAnchorElement(null)}

@@ -3,7 +3,7 @@
 import React from "react";
 import {useParams} from "next/navigation";
 import _ from 'lodash';
-import {GroupTopicsDisplay} from '@/react/components/GroupTopicsDisplay';
+import {GroupTopicsDisplay} from '@/react/components/group/GroupTopicsDisplay';
 
 
 export default function Page() {

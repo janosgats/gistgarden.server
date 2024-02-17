@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import _ from 'lodash';
 import {isValidNonNegativeNumber} from '@/util/both/CommonValidators';
 import DisplaySettingsOutlinedIcon from '@mui/icons-material/DisplaySettingsOutlined';
-import {GroupTopicsDisplay} from '@/react/components/GroupTopicsDisplay';
+import {GroupTopicsDisplay} from '@/react/components/group/GroupTopicsDisplay';
 
 const SEARCH_PARAM_KEY_GROUP_IDS = 'groups'
 
