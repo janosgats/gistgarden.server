@@ -10,6 +10,7 @@ import _ from 'lodash';
 import {isValidNonNegativeNumber} from '@/util/both/CommonValidators';
 import DisplaySettingsOutlinedIcon from '@mui/icons-material/DisplaySettingsOutlined';
 import {GroupTopicsDisplay} from '@/react/components/group/GroupTopicsDisplay';
+import {ShowPrivateTopicsSwitch} from '@/app/views/instantMultiGroup/ShowPrivateTopicsSwitch';
 
 const SEARCH_PARAM_KEY_GROUP_IDS = 'groups'
 
@@ -17,6 +18,8 @@ export default function Home() {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+
+    const [shouldShowPrivateTopics, setShouldShowPrivateTopics] = useState<boolean>(true)
 
     const searchedGroupIdsText = searchParams.get(SEARCH_PARAM_KEY_GROUP_IDS) as string
 
@@ -55,13 +58,15 @@ export default function Home() {
         <>
             <Typography variant="h4">Instant View of Multiple Groups</Typography>
 
+            <ShowPrivateTopicsSwitch shouldShowPrivateTopics={shouldShowPrivateTopics} setShouldShowPrivateTopics={setShouldShowPrivateTopics}/>
+
             <p>Groups in view: {groupIdsToDisplay.join('+')}</p>
 
 
             <Stack spacing={3}>
                 {groupIdsToDisplay.map(groupId => (
                     <Paper key={groupId} variant="elevation" elevation={6} sx={{padding: 2}}>
-                        <GroupTopicsDisplay groupId={groupId} displayAsStandalone={false}/>
+                        <GroupTopicsDisplay groupId={groupId} displayAsStandalone={false} showPrivateTopics={shouldShowPrivateTopics}/>
                     </Paper>
                 ))}
 

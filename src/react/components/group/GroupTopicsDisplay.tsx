@@ -20,6 +20,7 @@ import {NewTopicAdder} from '@/react/components/group/NewTopicAdder';
 interface Props {
     groupId: number
     displayAsStandalone: boolean
+    showPrivateTopics: boolean
 }
 
 export const GroupTopicsDisplay: FC<Props> = (props) => {
@@ -153,7 +154,7 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
             )}
             <UsedEndpointSuspense usedEndpoint={usedTopics}>
                 <Stack spacing={2}>
-                    {topicsToDisplay?.map(topic => (
+                    {topicsToDisplay?.filter(it => props.showPrivateTopics || !it.isPrivate)?.map(topic => (
                         <Topic
                             key={topic.id}
                             initialTopic={topic}
