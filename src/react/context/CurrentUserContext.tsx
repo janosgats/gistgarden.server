@@ -1,7 +1,6 @@
 import React, {createContext, FC, ReactNode, useContext, useEffect, useState} from 'react';
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {CurrentUserInfo} from '@/magicRouter/routes/userAuthRoutes';
-import {userLoginStatusEventBus} from '@/util/frontend/callServer';
 
 interface ICurrentUserContext {
     reload: () => void
@@ -71,9 +70,7 @@ export const CurrentUserContextProvider: FC<{ children: ReactNode }> = ({childre
 
     const [valueToProvide, setValueToProvide] = useState<ICurrentUserContext>(() => composeValueToProvide());
     useEffect(() => {
-        const composedValue = composeValueToProvide()
-        userLoginStatusEventBus.setSessionExpiredSubscriber(() => composedValue.reload())
-        setValueToProvide(composedValue)
+        setValueToProvide(composeValueToProvide())
     }, [usedLoginStatus.succeeded, requestFailureCount])
 
 

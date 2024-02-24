@@ -6,6 +6,7 @@ import {QuickAddPointDialog} from '@/react/components/quickAddPoint/QuickAddPoin
 import {ThemeSelectorContextProvider} from '@/react/context/ThemeSelectorContext';
 import {CurrentUserContext, CurrentUserContextProvider, MultiAttemptQueryStatus} from '@/react/context/CurrentUserContext';
 import {LoginPrompt} from '@/react/components/LoginPrompt';
+import {NotLoggedInSnackbar} from '@/react/components/NotLoggedInSnackbar';
 
 
 const drawerWidth = 240;
@@ -35,6 +36,7 @@ export default function ClientRootLayout({children}: { children: React.ReactNode
                         <QuickAddPointDialog isOpen={isQuickAddPointDialogOpen} onClose={() => setIsQuickAddPointDialogOpen(false)}/>
                         <BottomDecoration/>
                     </LoginWall>
+                    <NotLoggedInSnackbar/>
                     </body>
                 </CurrentUserContextProvider>
             </CssBaseline>
