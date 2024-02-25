@@ -5,7 +5,7 @@ import {NavBar} from '@/react/components/nav/NavBar';
 import {QuickAddPointDialog} from '@/react/components/quickAddPoint/QuickAddPointDialog';
 import {ThemeSelectorContextProvider} from '@/react/context/ThemeSelectorContext';
 import {CurrentUserContext, CurrentUserContextProvider, MultiAttemptQueryStatus} from '@/react/context/CurrentUserContext';
-import {LoginPrompt} from '@/react/components/LoginPrompt';
+import {LoginPrompt} from '@/react/components/login/LoginPrompt';
 import {NotLoggedInSnackbar} from '@/react/components/NotLoggedInSnackbar';
 
 
