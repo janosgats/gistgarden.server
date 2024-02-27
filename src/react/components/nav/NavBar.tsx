@@ -159,7 +159,7 @@ const DrawerContent: FC<DrawerContentProps> = (props) => {
         <div>
             <List>
                 <ListItem>
-                    <ListItemButton onClick={() => handleRouterPushingMenuItemClick('/')}>
+                    <ListItemButton onClick={() => handleRouterPushingMenuItemClick('/dashboard')}>
                         <Stack
                             width="100%"
                             direction="row"

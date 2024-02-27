@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {useParams} from "next/navigation";
 import _ from 'lodash';
 import {GroupTopicsDisplay} from '@/react/components/group/GroupTopicsDisplay';
-import {ShowPrivateTopicsSwitch} from '@/app/views/instantMultiGroup/ShowPrivateTopicsSwitch';
+import {ShowPrivateTopicsSwitch} from '@/app/(coreApplication)/views/instantMultiGroup/ShowPrivateTopicsSwitch';
 
 
 export default function Page() {

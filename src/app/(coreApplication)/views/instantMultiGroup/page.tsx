@@ -10,7 +10,7 @@ import _ from 'lodash';
 import {isValidNonNegativeNumber} from '@/util/both/CommonValidators';
 import DisplaySettingsOutlinedIcon from '@mui/icons-material/DisplaySettingsOutlined';
 import {GroupTopicsDisplay} from '@/react/components/group/GroupTopicsDisplay';
-import {ShowPrivateTopicsSwitch} from '@/app/views/instantMultiGroup/ShowPrivateTopicsSwitch';
+import {ShowPrivateTopicsSwitch} from '@/app/(coreApplication)/views/instantMultiGroup/ShowPrivateTopicsSwitch';
 
 const SEARCH_PARAM_KEY_GROUP_IDS = 'groups'
 
