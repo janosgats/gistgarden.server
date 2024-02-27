@@ -1,7 +1,9 @@
 import React, {FC, useState} from "react";
-import {Button, Stack, TextField, Typography} from '@mui/material';
+import {Button, CircularProgress, Stack, TextField, Typography} from '@mui/material';
 import {isValidNonEmptyString} from '@/util/both/CommonValidators';
 import CelebrationOutlinedIcon from '@mui/icons-material/CelebrationOutlined';
+import useAction from '@/react/hooks/useAction';
+import callServer from '@/util/frontend/callServer';
 
 
 interface Props {
@@ -50,6 +52,30 @@ export const RegisterPanel: FC<Props> = (props) => {
     const isPasswordValid = passwordValidationErrors.length === 0
 
     const doPasswordsMatch = password === passwordAgain && isValidNonEmptyString(passwordAgain)
+
+    const usedSubmitRegistrationInquiry = useAction({
+        actionFunction: async () => {
+            await callServer({
+                url: '/api/registration/submitEmailPasswordRegistrationInquiry',
+                method: 'POST',
+                data: {
+                    email: email,
+                    password: password,
+                },
+            }).catch((e) => {
+                alert('Error while starting your registration')
+                throw e
+            }).then(() => {
+                setEmail('')
+                setDidEmailFieldLoseFocus(false)
+                setPassword('')
+                setDidPasswordFieldLoseFocus(false)
+                setPasswordAgain('')
+                setDidPasswordAgainFieldLoseFocus(false)
+                alert(`Congrats! Go, visit your inbox for ${email} to verify your email and access your account!`)
+            })
+        },
+    })
 
     return (<>
         <Stack spacing={2}>
@@ -112,8 +138,11 @@ export const RegisterPanel: FC<Props> = (props) => {
                 <Button
                     variant="contained"
                     disabled={!(isEmailValid && isPasswordValid && doPasswordsMatch)}
-                    endIcon={<CelebrationOutlinedIcon/>}
-                    onClick={() => alert('TODO: implement email-based registration')}
+                    endIcon={usedSubmitRegistrationInquiry.pending ? <CircularProgress
+                        size="1.3rem"
+                        sx={{color: 'white'}}
+                    /> : <CelebrationOutlinedIcon/>}
+                    onClick={() => usedSubmitRegistrationInquiry.run()}
                 >
                     Register
                 </Button>
