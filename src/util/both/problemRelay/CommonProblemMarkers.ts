@@ -18,7 +18,7 @@ function srvMarkerOf(marker: ProblemMarkerWithoutDomain): MatchingProblemMarker 
 const CommonProblemMarkers = {
     GgCommon: {
         InvalidFields: {
-            INVALID_FIELDS: matcherOf(ProblemRelayConstants.DOMAIN.GgWs, 1, 1),
+            INVALID_FIELDS: matcherOf(ProblemRelayConstants.DOMAIN.GgCommon, 1, 1),
         },
     },
     GgSrv: {
@@ -29,6 +29,13 @@ const CommonProblemMarkers = {
                 subTypeId: 1,
                 subTypeName: 'NO_USER_IS_LOGGED_IN',
             }),
+        },
+    },
+    GgWs: {
+        Registration: {
+            EMAIL_PASSWORD_REGISTRATION_INQUIRY_NOT_FOUND: matcherOf(ProblemRelayConstants.DOMAIN.GgWs, 8, 1),
+            EMAIL_IS_ALREADY_TAKEN: matcherOf(ProblemRelayConstants.DOMAIN.GgWs, 8, 2),
+            EMAIL_PASSWORD_REGISTRATION_INQUIRY_IS_EXPIRED: matcherOf(ProblemRelayConstants.DOMAIN.GgWs, 8, 3),
         },
     },
 };

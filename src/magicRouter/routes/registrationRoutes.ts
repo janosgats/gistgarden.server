@@ -24,4 +24,22 @@ export function setRegistrationRoutes(magicRouter: MagicRouter) {
             return {}
         },
     )
+
+
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_REGISTRATION + '/verifyEmailForEmailPasswordRegistration',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+
+            await callUpstream({
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
+                url: '/api/registration/verifyEmailForEmailPasswordRegistration',
+                method: "post",
+                data: {
+                    inquiryId: request.body.inquiryId,
+                    emailVerificationSecret: request.body.emailVerificationSecret,
+                },
+            })
+
+            return {}
+        },
+    )
 }
