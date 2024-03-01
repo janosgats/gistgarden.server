@@ -124,14 +124,16 @@ export default function Home() {
                             </UsedEndpointSuspense>
                         </CardContent>
                         <CardActions sx={{justifyContent: 'right'}}>
-                            <Button
-                                startIcon={<GroupAddIcon/>}
-                                variant="outlined"
-                                color="secondary"
-                                onClick={() => setIsCreateNewGroupDialogOpen(true)}
-                            >
-                                Create new Group
-                            </Button>
+                            {!isCreateNewGroupDialogOpen && (
+                                <Button
+                                    startIcon={<GroupAddIcon/>}
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={() => setIsCreateNewGroupDialogOpen(true)}
+                                >
+                                    Create new Group
+                                </Button>
+                            )}
                         </CardActions>
 
                         {isCreateNewGroupDialogOpen && (
@@ -201,8 +203,10 @@ const CreateGroupPanel: FC<CreateGroupPanelProps> = (props) => {
 
     return (<>
         <DevPanel>
-            <input value={enteredName} onChange={e => setEnteredName(e.target.value)} autoFocus/>
-            <button onClick={() => onSubmit()}>Create Group</button>
+            <label>Group name: </label>
+            <input value={enteredName} onChange={e => setEnteredName(e.target.value)} autoFocus style={{marginBottom: 8}}/>
+            <br/>
+            <Button onClick={() => onSubmit()} variant="contained" size="small">Create Group</Button>
         </DevPanel>
     </>)
 }
