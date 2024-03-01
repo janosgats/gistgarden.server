@@ -7,7 +7,7 @@ import {DevPanel} from "@/react/components/DevPanel";
 import Link from "next/link";
 import {CreateGroupResponse, SimpleGroupResponse} from "@/magicRouter/routes/groupManagementRoutes";
 import {UsedEndpointSuspense} from "@/react/components/UsedEndpointSuspense";
-import {Avatar, Box, Button, Card, CardActions, CardContent, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Stack, Typography} from '@mui/material';
+import {Avatar, Box, Button, Card, CardActions, CardContent, Divider, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Stack, Tooltip, Typography} from '@mui/material';
 import _ from 'lodash';
 import {Property} from 'csstype';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -15,6 +15,7 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import Grid from '@mui/system/Unstable_Grid';
 import {useCurrentUserContext} from '@/react/context/CurrentUserContext';
 import {UserInfoResponse} from '@/magicRouter/routes/userRoutes';
+import {differenceInSeconds, parseISO} from 'date-fns';
 
 function getFirstLettersOfWords(sentence: string): string {
     if (!sentence) {
@@ -53,6 +54,51 @@ const GroupLoadSkeleton = <Stack spacing={2} paddingTop={2}>
 function getAvatarBackgroundColor(groupId: number): Property.Color {
     const colorIndex = groupId % avatarColors.length
     return avatarColors[colorIndex]
+}
+
+function calculateAgeFromLastActivityAt(lastActivityAtString: string): string {
+    const lastActivityAt = parseISO(lastActivityAtString)
+
+    const ageSeconds = differenceInSeconds(Date.now(), lastActivityAt)
+
+    const MINUTE_AS_SECONDS = 60
+    const HOUR_AS_SECONDS = 60 * MINUTE_AS_SECONDS
+    const DAY_AS_SECONDS = 24 * HOUR_AS_SECONDS
+    const WEEK_AS_SECONDS = 7 * DAY_AS_SECONDS
+    const MONTH_AS_SECONDS = 30.5 * DAY_AS_SECONDS
+    const YEAR_AS_SECONDS = 365 * DAY_AS_SECONDS
+
+    function getPluralEnding(value: number): string {
+        return value > 1 ? 's' : ''
+    }
+
+    if (ageSeconds < 40) {
+        return 'just now'
+    }
+    if (ageSeconds < HOUR_AS_SECONDS) {
+        const minutes = Math.floor(ageSeconds / MINUTE_AS_SECONDS)
+        return `${minutes} min` + getPluralEnding(minutes)
+    }
+    if (ageSeconds < DAY_AS_SECONDS) {
+        const hours = Math.floor(ageSeconds / HOUR_AS_SECONDS)
+
+        return `${hours} hour` + getPluralEnding(hours)
+    }
+    if (ageSeconds < WEEK_AS_SECONDS) {
+        const days = Math.floor(ageSeconds / DAY_AS_SECONDS)
+        return `${days} day` + getPluralEnding(days)
+    }
+    if (ageSeconds < MONTH_AS_SECONDS) {
+        const weeks = Math.floor(ageSeconds / WEEK_AS_SECONDS)
+        return `${weeks} week` + getPluralEnding(weeks)
+    }
+    if (ageSeconds < YEAR_AS_SECONDS) {
+        const months = Math.floor(ageSeconds / MONTH_AS_SECONDS)
+        return `${months} month` + getPluralEnding(months)
+    }
+
+    const years = Math.floor(ageSeconds / YEAR_AS_SECONDS)
+    return `${years} year` + getPluralEnding(years)
 }
 
 export default function Home() {
@@ -112,7 +158,9 @@ export default function Home() {
                                                                 >
                                                                     Végh Béla, Winch Eszter, +4
                                                                 </Typography>
-                                                                {" — 3 days ago"}
+                                                                <Tooltip title={parseISO(group.lastActivityAt)?.toLocaleString() || group.lastActivityAt}>
+                                                                    <span>{' — ' + calculateAgeFromLastActivityAt(group.lastActivityAt)}</span>
+                                                                </Tooltip>
                                                             </React.Fragment>
                                                         }
                                                     />

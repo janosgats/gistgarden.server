@@ -155,6 +155,7 @@ export function setGroupManagementRoutes(magicRouter: MagicRouter) {
 export interface SimpleGroupResponse {
     id: number;
     name: string;
+    lastActivityAt: string;
 }
 
 export interface CreateGroupResponse {
