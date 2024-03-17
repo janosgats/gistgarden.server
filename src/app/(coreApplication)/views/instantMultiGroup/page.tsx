@@ -1,7 +1,7 @@
 'use client'
 
 import React, {FC, useEffect, useState} from "react";
-import {Autocomplete, Button, Card, CardContent, Checkbox, CircularProgress, InputAdornment, ListItem, Paper, Stack, TextField, Tooltip, Typography} from '@mui/material';
+import {Autocomplete, Button, Card, CardContent, Checkbox, CircularProgress, InputAdornment, ListItem, Paper, Stack, TextField, Tooltip, Typography, useTheme} from '@mui/material';
 import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
@@ -15,6 +15,8 @@ import {ShowPrivateTopicsSwitch} from '@/app/(coreApplication)/views/instantMult
 const SEARCH_PARAM_KEY_GROUP_IDS = 'groups'
 
 export default function Home() {
+    const theme = useTheme()
+
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -63,7 +65,12 @@ export default function Home() {
             <p>Groups in view: {groupIdsToDisplay.join('+')}</p>
 
 
-            <Stack spacing={3}>
+            <Stack spacing={3} sx={{
+                [theme.breakpoints.down('sm')]: {
+                    marginLeft: -4,
+                    marginRight: -4,
+                },
+            }}>
                 {groupIdsToDisplay.map(groupId => (
                     <Paper key={groupId} variant="elevation" elevation={6} sx={{padding: 2}}>
                         <GroupTopicsDisplay groupId={groupId} displayAsStandalone={false} showPrivateTopics={shouldShowPrivateTopics}/>
