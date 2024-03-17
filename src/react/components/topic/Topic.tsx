@@ -133,31 +133,39 @@ export const Topic: FC<Props> = (props) => {
 
     return (<Box>
         <Stack direction="row">
-            <Stack>
-                <Tooltip title="Drag to reorder">
-                    <IconButton sx={{paddingLeft: 0, paddingRight: 0}}>
-                        <DragIndicatorOutlinedIcon/>
-                    </IconButton>
-                </Tooltip>
-            </Stack>
-            <Stack>
-                {usedToggleIsDone.pending ? (
-                    <CircularProgress size="1.375rem" sx={{margin: '10px', color: ProgressColors.pending}}/>
-                ) : (
-                    <Checkbox
-                        color="secondary"
-                        sx={{
-                            color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : 'secondary',
-                            '&.Mui-checked': {
+            <Stack sx={{
+                flexDirection: 'row',
+                [theme.breakpoints.down('md')]: {
+                    flexDirection: 'column-reverse',
+                    justifyContent: 'start',
+                },
+            }}>
+                <Stack>
+                    <Tooltip title="Drag to reorder">
+                        <IconButton sx={{paddingLeft: 0, paddingRight: 0}}>
+                            <DragIndicatorOutlinedIcon/>
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+                <Stack>
+                    {usedToggleIsDone.pending ? (
+                        <CircularProgress size="1.375rem" sx={{margin: '10px', color: ProgressColors.pending}}/>
+                    ) : (
+                        <Checkbox
+                            color="secondary"
+                            sx={{
                                 color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : 'secondary',
-                            },
-                        }}
-                        checked={lastSavedTopicState.isDone}
-                        onChange={() => usedToggleIsDone.run()}
-                    />
-                )}
-                {usedToggleIsDone.failed && <span>Error while saving <button onClick={() => usedToggleIsDone.run()}>Retry</button></span>}
+                                '&.Mui-checked': {
+                                    color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : 'secondary',
+                                },
+                            }}
+                            checked={lastSavedTopicState.isDone}
+                            onChange={() => usedToggleIsDone.run()}
+                        />
+                    )}
+                    {usedToggleIsDone.failed && <span>Error while saving <button onClick={() => usedToggleIsDone.run()}>Retry</button></span>}
 
+                </Stack>
             </Stack>
 
             <TextField
@@ -234,83 +242,91 @@ export const Topic: FC<Props> = (props) => {
                 </Stack>
             </Stack>
 
-            <Stack>
-                <Tooltip title="Click for More">
-                    <IconButton onClick={e => setMoreMenuAnchorElement(e.currentTarget)}>
-                        <MoreVertOutlinedIcon/>
-                    </IconButton>
-                </Tooltip>
-            </Stack>
+            <Stack sx={{
+                flexDirection: 'row',
+                [theme.breakpoints.down('md')]: {
+                    flexDirection: 'column-reverse',
+                    justifyContent: 'start',
+                },
+            }}>
+                <Stack>
+                    <Tooltip title="Click for More">
+                        <IconButton onClick={e => setMoreMenuAnchorElement(e.currentTarget)}>
+                            <MoreVertOutlinedIcon/>
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
 
-            <Menu
-                anchorEl={moreMenuAnchorElement}
-                open={!!moreMenuAnchorElement}
-                onClose={() => setMoreMenuAnchorElement(null)}
-            >
-                <MenuItem
-                    onClick={() => {
-                        setMoreMenuAnchorElement(null)
-                        setIsTopicCommentAdderOpen(true)
-                    }}
-                    sx={{
-                        [theme.breakpoints.up('md')]: {
-                            display: 'none',
-                        },
-                    }}
+                <Menu
+                    anchorEl={moreMenuAnchorElement}
+                    open={!!moreMenuAnchorElement}
+                    onClose={() => setMoreMenuAnchorElement(null)}
                 >
-                    <ListItemIcon>
-                        <CommentOutlinedIcon/>
-                    </ListItemIcon>
-                    <ListItemText>Comment</ListItemText>
-                </MenuItem>
+                    <MenuItem
+                        onClick={() => {
+                            setMoreMenuAnchorElement(null)
+                            setIsTopicCommentAdderOpen(true)
+                        }}
+                        sx={{
+                            [theme.breakpoints.up('md')]: {
+                                display: 'none',
+                            },
+                        }}
+                    >
+                        <ListItemIcon>
+                            <CommentOutlinedIcon/>
+                        </ListItemIcon>
+                        <ListItemText>Comment</ListItemText>
+                    </MenuItem>
 
-                <MenuItem
-                    onClick={() => alert('TODO: implement archival')}
-                    sx={{
-                        [theme.breakpoints.up('md')]: {
-                            display: 'none',
-                        },
-                    }}
-                >
-                    <ListItemIcon sx={{color: "orange"}}>
-                        <ArchiveOutlinedIcon/>
-                    </ListItemIcon>
-                    <ListItemText>Archive</ListItemText>
-                </MenuItem>
+                    <MenuItem
+                        onClick={() => alert('TODO: implement archival')}
+                        sx={{
+                            [theme.breakpoints.up('md')]: {
+                                display: 'none',
+                            },
+                        }}
+                    >
+                        <ListItemIcon sx={{color: "orange"}}>
+                            <ArchiveOutlinedIcon/>
+                        </ListItemIcon>
+                        <ListItemText>Archive</ListItemText>
+                    </MenuItem>
 
-                <MenuItem
-                    onClick={() => usedToggleIsPrivate.run().then(() => setMoreMenuAnchorElement(null))}
-                    disabled={usedToggleIsPrivate.pending}
-                >
-                    <ListItemIcon sx={{color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green}}>
-                        {lastSavedTopicState.isPrivate ? (
-                            <LockOutlinedIcon/>
-                        ) : (
-                            <LockOpenOutlinedIcon/>
-                        )}
-                    </ListItemIcon>
-                    <ListItemText>Make {lastSavedTopicState.isPrivate ? 'Public' : 'Private'}</ListItemText>
-                </MenuItem>
+                    <MenuItem
+                        onClick={() => usedToggleIsPrivate.run().then(() => setMoreMenuAnchorElement(null))}
+                        disabled={usedToggleIsPrivate.pending}
+                    >
+                        <ListItemIcon sx={{color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green}}>
+                            {lastSavedTopicState.isPrivate ? (
+                                <LockOutlinedIcon/>
+                            ) : (
+                                <LockOpenOutlinedIcon/>
+                            )}
+                        </ListItemIcon>
+                        <ListItemText>Make {lastSavedTopicState.isPrivate ? 'Public' : 'Private'}</ListItemText>
+                    </MenuItem>
 
-                <MenuItem
-                    onClick={() => usedDeleteTopic.run().then(() => setMoreMenuAnchorElement(null))}
-                    disabled={usedDeleteTopic.pending}
-                >
-                    <ListItemIcon sx={{color: "red"}}>
-                        <DeleteForeverOutlinedIcon/>
-                    </ListItemIcon>
-                    <ListItemText>Delete</ListItemText>
-                </MenuItem>
-            </Menu>
+                    <MenuItem
+                        onClick={() => usedDeleteTopic.run().then(() => setMoreMenuAnchorElement(null))}
+                        disabled={usedDeleteTopic.pending}
+                    >
+                        <ListItemIcon sx={{color: "red"}}>
+                            <DeleteForeverOutlinedIcon/>
+                        </ListItemIcon>
+                        <ListItemText>Delete</ListItemText>
+                    </MenuItem>
+                </Menu>
 
-            <Stack>
-                <Tooltip title={"Added by user " + props.initialTopic.creatorUserId}>
-                    <div style={{padding: 8}}>
-                        <Avatar sx={{width: 26, height: 26, display: 'inline-flex'}}>
-                            {props.initialTopic.creatorUserId}
-                        </Avatar>
-                    </div>
-                </Tooltip>
+                <Stack>
+                    <Tooltip title={"Added by user " + props.initialTopic.creatorUserId}>
+                        <div style={{padding: 8}}>
+                            <Avatar sx={{width: 26, height: 26, display: 'inline-flex'}}>
+                                {props.initialTopic.creatorUserId}
+                            </Avatar>
+                        </div>
+                    </Tooltip>
+                </Stack>
             </Stack>
         </Stack>
 
