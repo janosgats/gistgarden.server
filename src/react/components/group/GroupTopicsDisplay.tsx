@@ -16,6 +16,7 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import {GroupMembersEditorDialog} from '@/react/components/group/GroupMembersEditorDialog';
 import {NewTopicAdder} from '@/react/components/group/NewTopicAdder';
+import KeyboardDoubleArrowDownOutlinedIcon from '@mui/icons-material/KeyboardDoubleArrowDownOutlined';
 
 interface Props {
     groupId: number
@@ -25,6 +26,7 @@ interface Props {
 
 export const GroupTopicsDisplay: FC<Props> = (props) => {
     const [isNewTopicAdderOpen, setIsNewTopicAdderOpen] = useState<boolean>(false)
+    const [shouldShowArchiveTopics, setShouldShowArchiveTopics] = useState<boolean>(false)
     const [isGroupRenamerOpen, setIsGroupRenamerOpen] = useState<boolean>(false)
     const [isGroupMemberEditorOpen, setIsGroupMemberEditorOpen] = useState<boolean>(false)
     const [topicsToDisplay, setTopicsToDisplay] = useState<SimpleTopicResponse[] | null>(null)
@@ -42,12 +44,13 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
     })
 
 
-    const usedTopics = useEndpoint<SimpleTopicResponse[]>({
+    const usedNonArchiveTopics = useEndpoint<SimpleTopicResponse[]>({
         config: {
             url: '/api/topic/listTopicsInGroup',
             method: "POST",
             data: {
                 groupId: props.groupId,
+                includeArchiveTopics: false,
             },
         },
         customSuccessProcessor: (axiosResponse) => {
@@ -58,6 +61,33 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
             setTopicsToDisplay(null)
         },
     })
+
+    const usedAllTopics = useEndpoint<SimpleTopicResponse[]>({
+        config: {
+            url: '/api/topic/listTopicsInGroup',
+            method: "POST",
+            data: {
+                groupId: props.groupId,
+                includeArchiveTopics: true,
+            },
+        },
+        customSuccessProcessor: (axiosResponse) => {
+            setTopicsToDisplay(axiosResponse.data)
+            return axiosResponse.data
+        },
+        onError: () => {
+            setTopicsToDisplay(null)
+        },
+        sendRequestOnDependencyChange: shouldShowArchiveTopics,
+    })
+
+    function reloadTopics() {
+        if (shouldShowArchiveTopics) {
+            usedAllTopics.reloadEndpoint()
+        } else {
+            usedNonArchiveTopics.reloadEndpoint()
+        }
+    }
 
     return (
         <>
@@ -152,20 +182,39 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                     </Link>
                 </Tooltip>
             )}
-            <UsedEndpointSuspense usedEndpoint={usedTopics}>
+            <UsedEndpointSuspense usedEndpoint={usedNonArchiveTopics}>
                 <Stack spacing={2}>
-                    {topicsToDisplay?.filter(it => props.showPrivateTopics || !it.isPrivate)?.map(topic => (
-                        <Topic
-                            key={topic.id}
-                            initialTopic={topic}
-                            afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
-                                if (wasDeletionSurelySuccessful) {
-                                    setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
-                                } else {
-                                    usedTopics.reloadEndpoint()
-                                }
-                            }}/>
-                    ))}
+                    {topicsToDisplay
+                        ?.filter(it => props.showPrivateTopics || !it.isPrivate)
+                        ?.filter(it => !it.isArchive)
+                        ?.map(topic => (
+                            <Topic
+                                key={topic.id}
+                                initialTopic={topic}
+                                afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
+                                    if (wasDeletionSurelySuccessful) {
+                                        setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
+                                    } else {
+                                        reloadTopics()
+                                    }
+                                }}
+                                afterSetIsArchiveStateAttempt={(wasSurelySuccessful, newIsArchive) => {
+                                    if (wasSurelySuccessful) {
+                                        setTopicsToDisplay(prevState => prevState?.map(it => {
+                                            if (it.id === topic.id) {
+                                                return {
+                                                    ...it,
+                                                    isArchive: newIsArchive,
+                                                }
+                                            }
+                                            return it
+                                        }) || null)
+                                    } else {
+                                        reloadTopics()
+                                    }
+                                }}
+                            />
+                        ))}
 
                     {!isNewTopicAdderOpen && (
                         <Button
@@ -178,14 +227,66 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                     )}
                     {isNewTopicAdderOpen && (
                         <NewTopicAdder groupId={props.groupId} afterNewTopicSaved={() => {
-                            usedTopics.reloadEndpoint()
+                            reloadTopics()
                             setIsNewTopicAdderOpen(false)
                         }}/>
                     )}
 
-
                 </Stack>
             </UsedEndpointSuspense>
+
+            <Stack marginTop={2}>
+                {!shouldShowArchiveTopics && (
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => setShouldShowArchiveTopics(true)}
+                        fullWidth
+                        startIcon={<KeyboardDoubleArrowDownOutlinedIcon/>}
+                        endIcon={<KeyboardDoubleArrowDownOutlinedIcon/>}
+                    >
+                        Show archive topics
+                    </Button>
+                )}
+
+                {shouldShowArchiveTopics && (
+                    <UsedEndpointSuspense usedEndpoint={usedAllTopics}>
+                        <Stack spacing={2}>
+                            {topicsToDisplay
+                                ?.filter(it => props.showPrivateTopics || !it.isPrivate)
+                                ?.filter(it => it.isArchive)
+                                ?.map(topic => (
+                                    <Topic
+                                        key={topic.id}
+                                        initialTopic={topic}
+                                        afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
+                                            if (wasDeletionSurelySuccessful) {
+                                                setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
+                                            } else {
+                                                reloadTopics()
+                                            }
+                                        }}
+                                        afterSetIsArchiveStateAttempt={(wasSurelySuccessful, newIsArchive) => {
+                                            if (wasSurelySuccessful) {
+                                                setTopicsToDisplay(prevState => prevState?.map(it => {
+                                                    if (it.id === topic.id) {
+                                                        return {
+                                                            ...it,
+                                                            isArchive: newIsArchive,
+                                                        }
+                                                    }
+                                                    return it
+                                                }) || null)
+                                            } else {
+                                                reloadTopics()
+                                            }
+                                        }}
+                                    />
+                                ))}
+                        </Stack>
+                    </UsedEndpointSuspense>
+                )}
+            </Stack>
         </>
     )
 }

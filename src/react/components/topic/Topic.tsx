@@ -4,6 +4,7 @@ import {Avatar, Box, Checkbox, CircularProgress, IconButton, ListItemIcon, ListI
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import {ProgressColors} from '@/react/res/ProgressColors';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
+import UnarchiveOutlinedIcon from '@mui/icons-material/UnarchiveOutlined';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import DragIndicatorOutlinedIcon from '@mui/icons-material/DragIndicatorOutlined';
 import {SimpleTopicResponse} from '@/magicRouter/routes/topicRoutes';
@@ -19,6 +20,7 @@ import {TopicCommentsDisplay} from '@/react/components/topic/TopicCommentsDispla
 interface Props {
     initialTopic: SimpleTopicResponse,
     afterTopicDeletionAttempt: (wasDeletionSurelySuccessful: boolean) => void
+    afterSetIsArchiveStateAttempt: (wasSurelySuccessful: boolean, newIsArchive: boolean) => void
 }
 
 export const Topic: FC<Props> = (props) => {
@@ -103,6 +105,28 @@ export const Topic: FC<Props> = (props) => {
         },
     })
 
+    const usedSetIsArchiveState = useAction<boolean>({
+        actionFunction: async (newIsArchive) => {
+            await callServer({
+                url: '/api/topic/setIsArchiveState',
+                method: "POST",
+                data: {
+                    topicId: props.initialTopic.id,
+                    newIsArchive: newIsArchive,
+                },
+            })
+                .then(() => {
+                    setLastSavedTopicState((prevState) => ({...prevState, isArchive: newIsArchive}))
+                    props.afterSetIsArchiveStateAttempt(true, newIsArchive)
+                })
+                .catch((err) => {
+                    alert('Error while ' + (newIsArchive ? '' : 'un') + 'archiving topic')
+                    props.afterSetIsArchiveStateAttempt(false, newIsArchive)
+                    throw err
+                })
+        },
+    })
+
     const usedSaveNewDescriptionIfChanged = useAction({
         actionFunction: async () => {
             if (description === lastSavedTopicState.description) {
@@ -142,7 +166,7 @@ export const Topic: FC<Props> = (props) => {
             }}>
                 <Stack>
                     <Tooltip title="Drag to reorder">
-                        <IconButton sx={{paddingLeft: 0, paddingRight: 0}}>
+                        <IconButton sx={{paddingLeft: 0, paddingRight: 0}} onClick={() => alert('TODO: ordering is not yet implemented')}>
                             <DragIndicatorOutlinedIcon/>
                         </IconButton>
                     </Tooltip>
@@ -234,9 +258,14 @@ export const Topic: FC<Props> = (props) => {
                     </Tooltip>
                 </Stack>
                 <Stack>
-                    <Tooltip title="Archive">
-                        <IconButton onClick={() => alert('TODO: implement archival')}>
-                            <ArchiveOutlinedIcon sx={{color: "orange"}}/>
+                    <Tooltip title={lastSavedTopicState.isArchive ? 'Unarchive' : 'Archive'}>
+                        <IconButton
+                            onClick={() => usedSetIsArchiveState.run(!lastSavedTopicState.isArchive)}>
+                            {lastSavedTopicState.isArchive ? (
+                                <UnarchiveOutlinedIcon sx={{color: "orangered"}}/>
+                            ) : (
+                                <ArchiveOutlinedIcon sx={{color: "orange"}}/>
+                            )}
                         </IconButton>
                     </Tooltip>
                 </Stack>
@@ -280,28 +309,33 @@ export const Topic: FC<Props> = (props) => {
                     </MenuItem>
 
                     <MenuItem
-                        onClick={() => alert('TODO: implement archival')}
+                        onClick={() => usedSetIsArchiveState.run(!lastSavedTopicState.isArchive).then(() => setMoreMenuAnchorElement(null))}
+                        disabled={usedSetIsArchiveState.pending}
                         sx={{
                             [theme.breakpoints.up('md')]: {
                                 display: 'none',
                             },
                         }}
                     >
-                        <ListItemIcon sx={{color: "orange"}}>
-                            <ArchiveOutlinedIcon/>
+                        <ListItemIcon>
+                            {lastSavedTopicState.isArchive ? (
+                                <UnarchiveOutlinedIcon sx={{color: "orangered"}}/>
+                            ) : (
+                                <ArchiveOutlinedIcon sx={{color: "orange"}}/>
+                            )}
                         </ListItemIcon>
-                        <ListItemText>Archive</ListItemText>
+                        <ListItemText>{lastSavedTopicState.isArchive ? 'Unarchive' : 'Archive'}</ListItemText>
                     </MenuItem>
 
                     <MenuItem
                         onClick={() => usedToggleIsPrivate.run().then(() => setMoreMenuAnchorElement(null))}
                         disabled={usedToggleIsPrivate.pending}
                     >
-                        <ListItemIcon sx={{color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.red : theme.palette.accessControl.green}}>
+                        <ListItemIcon sx={{color: lastSavedTopicState.isPrivate ? theme.palette.accessControl.green : theme.palette.accessControl.red}}>
                             {lastSavedTopicState.isPrivate ? (
-                                <LockOutlinedIcon/>
-                            ) : (
                                 <LockOpenOutlinedIcon/>
+                            ) : (
+                                <LockOutlinedIcon/>
                             )}
                         </ListItemIcon>
                         <ListItemText>Make {lastSavedTopicState.isPrivate ? 'Public' : 'Private'}</ListItemText>

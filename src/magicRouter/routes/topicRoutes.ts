@@ -40,6 +40,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
                 data: {
                     initiatorUserId: loggedInUserId,
                     groupId: request.body.groupId,
+                    includeArchiveTopics: request.body.includeArchiveTopics,
                 },
             })
 
@@ -82,6 +83,26 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
                     initiatorUserId: loggedInUserId,
                     topicId: request.body.topicId,
                     newIsDone: request.body.newIsDone,
+                },
+            })
+
+            return {}
+        },
+    )
+
+
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_TOPIC + '/setIsArchiveState',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            await callUpstream<SimpleTopicResponse[]>({
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
+                url: '/api/userInitiated/topic/setIsArchiveState',
+                method: 'POST',
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    topicId: request.body.topicId,
+                    newIsArchive: request.body.newIsArchive,
                 },
             })
 
@@ -134,6 +155,7 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
 export interface SimpleTopicResponse {
     id: number;
     isDone: boolean;
+    isArchive: boolean;
     isPrivate: boolean;
     description: string;
     creatorUserId: number;
