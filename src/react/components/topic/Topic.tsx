@@ -16,11 +16,14 @@ import MoreVertOutlinedIcon from '@mui/icons-material/MoreVertOutlined';
 import useAction from '@/react/hooks/useAction';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import {TopicCommentsDisplay} from '@/react/components/topic/TopicCommentsDisplay';
+import {DraggableProvided} from '@hello-pangea/dnd';
 
 interface Props {
     initialTopic: SimpleTopicResponse,
     afterTopicDeletionAttempt: (wasDeletionSurelySuccessful: boolean) => void
     afterSetIsArchiveStateAttempt: (wasSurelySuccessful: boolean, newIsArchive: boolean) => void
+
+    draggableProvided?: DraggableProvided
 }
 
 export const Topic: FC<Props> = (props) => {
@@ -155,7 +158,11 @@ export const Topic: FC<Props> = (props) => {
 
     const wasTopicCreatedByCurrentUser = (props.initialTopic.creatorUserId === currentUserContext.userId) || !props.initialTopic.creatorUserId
 
-    return (<Box>
+    return (<Box
+        ref={props.draggableProvided?.innerRef}
+        {...props.draggableProvided?.draggableProps}
+        {...props.draggableProvided?.dragHandleProps}
+    >
         <Stack direction="row">
             <Stack sx={{
                 flexDirection: 'row',
@@ -164,13 +171,15 @@ export const Topic: FC<Props> = (props) => {
                     justifyContent: 'start',
                 },
             }}>
-                <Stack>
-                    <Tooltip title="Drag to reorder">
-                        <IconButton sx={{paddingLeft: 0, paddingRight: 0}} onClick={() => alert('TODO: ordering is not yet implemented')}>
-                            <DragIndicatorOutlinedIcon/>
-                        </IconButton>
-                    </Tooltip>
-                </Stack>
+                {props.draggableProvided && (
+                    <Stack>
+                        <Tooltip title="Drag to reorder">
+                            <IconButton sx={{paddingLeft: 0, paddingRight: 0}} style={{cursor: "grab"}}>
+                                <DragIndicatorOutlinedIcon sx={{cursor: "grab"}}/>
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                )}
                 <Stack>
                     {usedToggleIsDone.pending ? (
                         <CircularProgress size="1.375rem" sx={{margin: '10px', color: ProgressColors.pending}}/>

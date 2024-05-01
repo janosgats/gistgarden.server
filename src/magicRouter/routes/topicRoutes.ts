@@ -149,6 +149,26 @@ export function setTopicRoutes(magicRouter: MagicRouter) {
         },
     )
 
+
+    magicRouter.setSimpleJsonHandler('POST', PATH_PREFIX_TOPIC + '/saveTopicDisplayOrder',
+        async (request: SimpleJsonRequest): Promise<SimpleJsonResponse> => {
+            const loggedInUserId = await resolveLoggedInUserId()
+
+            await callUpstream({
+                baseURL: appConfig.upstreamApis.gistGardenWebserviceBaseUrl,
+                url: '/api/userInitiated/topic/saveTopicDisplayOrder',
+                method: 'POST',
+                data: {
+                    initiatorUserId: loggedInUserId,
+                    groupId: request.body.groupId,
+                    topicIdsInDisplayOrder: request.body.topicIdsInDisplayOrder,
+                },
+            })
+
+            return {}
+        },
+    )
+
 }
 
 
