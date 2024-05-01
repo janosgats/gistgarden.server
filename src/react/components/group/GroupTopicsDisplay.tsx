@@ -224,6 +224,7 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                                                             key={topic.id}
                                                             {...draggableProvided.draggableProps}
                                                             {...draggableProvided.dragHandleProps}
+                                                            style={{display: 'none'}}
                                                         />
                                                     }
 
