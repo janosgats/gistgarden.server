@@ -1,7 +1,7 @@
 'use client'
 
 import React, {FC, useEffect, useState} from "react";
-import {Autocomplete, Button, Card, CardContent, Checkbox, CircularProgress, InputAdornment, ListItem, Paper, Stack, TextField, Tooltip, Typography, useTheme} from '@mui/material';
+import {Autocomplete, Button, Card, CardContent, Checkbox, CircularProgress, Dialog, DialogContent, InputAdornment, ListItem, Paper, Slide, Stack, TextField, Tooltip, Typography, useTheme} from '@mui/material';
 import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
@@ -11,6 +11,7 @@ import {isValidNonNegativeNumber} from '@/util/both/CommonValidators';
 import DisplaySettingsOutlinedIcon from '@mui/icons-material/DisplaySettingsOutlined';
 import {GroupTopicsDisplay} from '@/react/components/group/GroupTopicsDisplay';
 import {ShowPrivateTopicsSwitch} from '@/app/(coreApplication)/views/instantMultiGroup/ShowPrivateTopicsSwitch';
+import {TransitionProps} from '@mui/material/transitions';
 
 const SEARCH_PARAM_KEY_GROUP_IDS = 'groups'
 
@@ -89,6 +90,17 @@ export default function Home() {
     )
 }
 
+
+const Transition = React.forwardRef(function Transition(
+    props: TransitionProps & {
+        children: React.ReactElement<any, any>;
+    },
+    ref: React.Ref<unknown>,
+) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
+
 interface AddGroupToViewPanelProps {
     currentGroupIdsToDisplay: number[]
 
@@ -97,7 +109,8 @@ interface AddGroupToViewPanelProps {
 }
 
 const ChangeDisplayedGroupsPanel: FC<AddGroupToViewPanelProps> = (props) => {
-    const [isAutocompleteOpen, setIsAutocompleteOpen] = useState<boolean>(false)
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+    const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState<boolean>(false)
     const [searchInputText, setSearchInputText] = useState<string>('')
 
     const usedBelongingGroups = useEndpoint<SimpleGroupResponse[]>({
@@ -109,19 +122,21 @@ const ChangeDisplayedGroupsPanel: FC<AddGroupToViewPanelProps> = (props) => {
     })
 
     useEffect(() => {
-        if (isAutocompleteOpen) {
+        if (isDialogOpen) {
             usedBelongingGroups.reloadEndpoint()
+        } else {
+            setIsDropdownMenuOpen(false);
         }
 
-    }, [isAutocompleteOpen])
+    }, [isDialogOpen])
 
     return (<>
-        {isAutocompleteOpen || (
+        {isDialogOpen || (
             <Tooltip title={`Add or remove groups to display in this view`}>
                 <Button variant="outlined"
                         color="secondary"
                         fullWidth
-                        onClick={() => setIsAutocompleteOpen(true)}
+                        onClick={() => setIsDialogOpen(true)}
                         startIcon={<DisplaySettingsOutlinedIcon/>}>
                     Display other groups too
                 </Button>
@@ -129,61 +144,79 @@ const ChangeDisplayedGroupsPanel: FC<AddGroupToViewPanelProps> = (props) => {
         )}
 
 
-        {isAutocompleteOpen && (
-            <Autocomplete
-                onInputChange={(e, newInputValue) => setSearchInputText(newInputValue)}
-                options={usedBelongingGroups.data || []}
-                renderOption={(renderOptionProps, option, state, ownerState) => {
-                    const isOptionCurrentlyDisplayed = props.currentGroupIdsToDisplay.includes(option.id)
+        <Dialog
+            open={isDialogOpen}
+            onClose={() => setIsDialogOpen(false)}
+            TransitionComponent={Transition}
+            onTransitionEnd={() => {
+                if (isDialogOpen) {
+                    setIsDropdownMenuOpen(false);
+                    setTimeout(() => setIsDropdownMenuOpen(true), 100)
+                } else {
+                    setIsDropdownMenuOpen(false);
+                }
+            }}
+            fullWidth
+            disableRestoreFocus
+        >
+            <DialogContent>
 
-                    return (
-                        <ListItem
-                            key={option.id}
-                            {...(_.omit(renderOptionProps, 'key'))}
-                            onClick={() => isOptionCurrentlyDisplayed ? props.onRemoveGroup(option.id) : props.onAddNewGroup(option.id)}
-                        ><Checkbox
-                            style={{marginRight: 8}}
-                            checked={isOptionCurrentlyDisplayed}
+                <Autocomplete
+                    onInputChange={(e, newInputValue) => setSearchInputText(newInputValue)}
+                    options={usedBelongingGroups.data || []}
+                    renderOption={(renderOptionProps, option, state, ownerState) => {
+                        const isOptionCurrentlyDisplayed = props.currentGroupIdsToDisplay.includes(option.id)
+
+                        return (
+                            <ListItem
+                                key={option.id}
+                                {...(_.omit(renderOptionProps, 'key'))}
+                                onClick={() => isOptionCurrentlyDisplayed ? props.onRemoveGroup(option.id) : props.onAddNewGroup(option.id)}
+                            ><Checkbox
+                                style={{marginRight: 8}}
+                                checked={isOptionCurrentlyDisplayed}
+                            />
+                                <Typography>{option.name}</Typography>
+                            </ListItem>
+                        )
+                    }}
+                    onChange={(e, value) => console.log(value)}
+                    renderInput={(params) =>
+                        <TextField
+                            {...params}
+                            label="Search for groups to add to this view"
+                            placeholder="Start typing the group name..."
+                            fullWidth
+                            autoFocus
+                            InputProps={{
+                                ...(params.InputProps),
+                                startAdornment: <InputAdornment position="start"> <SearchIcon/> </InputAdornment>,
+                                endAdornment: (
+                                    <>
+                                        {usedBelongingGroups.pending ? <CircularProgress color="inherit" size={20}/> : null}
+                                        {params.InputProps.endAdornment}
+                                    </>
+                                ),
+                            }}
                         />
-                            <Typography>{option.name}</Typography>
-                        </ListItem>
-                    )
-                }}
-                onChange={(e, value) => console.log(value)}
-                renderInput={(params) =>
-                    <TextField
-                        {...params}
-                        label="Search for groups to add to this view"
-                        placeholder="Start typing the group name..."
-                        fullWidth
-                        autoFocus
-                        InputProps={{
-                            ...(params.InputProps),
-                            startAdornment: <InputAdornment position="start"> <SearchIcon/> </InputAdornment>,
-                            endAdornment: (
-                                <>
-                                    {usedBelongingGroups.pending ? <CircularProgress color="inherit" size={20}/> : null}
-                                    {params.InputProps.endAdornment}
-                                </>
-                            ),
-                        }}
-                    />
-                }
-                open={true}
-                onBlur={() => setIsAutocompleteOpen(false)}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                getOptionLabel={(option) => option.name}
-                loading={usedBelongingGroups.pending}
-                noOptionsText={
-                    <Card variant="outlined">
-                        <CardContent>
-                            <Typography variant="subtitle2" sx={{textDecoration: "italic"}}>
-                                Hmm, No results for &quot;{searchInputText}&quot;...
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                }
-            />
-        )}
+                    }
+                    open={isDropdownMenuOpen}
+                    onBlur={() => setIsDialogOpen(false)}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    getOptionLabel={(option) => option.name}
+                    loading={usedBelongingGroups.pending}
+                    noOptionsText={
+                        <Card variant="outlined">
+                            <CardContent>
+                                <Typography variant="subtitle2" sx={{textDecoration: "italic"}}>
+                                    Hmm, No results for &quot;{searchInputText}&quot;...
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    }
+                />
+
+            </DialogContent>
+        </Dialog>
     </>)
 }
