@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
 import callServer from '@/util/frontend/callServer';
-import {Box, Button, CircularProgress, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography} from '@mui/material';
+import {Box, Button, CircularProgress, Collapse, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography} from '@mui/material';
 import {UsedEndpointSuspense} from '@/react/components/UsedEndpointSuspense';
 import Link from 'next/link';
 import JoinFullOutlinedIcon from '@mui/icons-material/JoinFullOutlined';
@@ -217,7 +217,9 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                 </Tooltip>
             )}
 
-            <div style={{display: isMinimized ? "none" : "block"}}>
+
+            <Collapse in={!isMinimized} collapsedSize={0}>
+
 
                 {usedNonArchiveTopics.pending && <p>Loading topics...</p>}
                 {(usedAllTopics.failed || usedNonArchiveTopics.failed) && <p>Failed to load topics :/ <button onClick={() => reloadTopics()}>Retry</button></p>}
@@ -348,7 +350,7 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                         </UsedEndpointSuspense>
                     )}
                 </Stack>
-            </div>
+            </Collapse>
         </>
     )
 }
