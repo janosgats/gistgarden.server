@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import useEndpoint from '@/react/hooks/useEndpoint';
 import {SimpleGroupResponse} from '@/magicRouter/routes/groupManagementRoutes';
 import callServer from '@/util/frontend/callServer';
-import {Button, CircularProgress, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography} from '@mui/material';
+import {Box, Button, CircularProgress, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography} from '@mui/material';
 import {UsedEndpointSuspense} from '@/react/components/UsedEndpointSuspense';
 import Link from 'next/link';
 import JoinFullOutlinedIcon from '@mui/icons-material/JoinFullOutlined';
@@ -19,6 +19,8 @@ import {NewTopicAdder} from '@/react/components/group/NewTopicAdder';
 import KeyboardDoubleArrowDownOutlinedIcon from '@mui/icons-material/KeyboardDoubleArrowDownOutlined';
 import KeyboardDoubleArrowUpOutlinedIcon from '@mui/icons-material/KeyboardDoubleArrowUpOutlined';
 import {DragDropContext, Draggable, Droppable, DropResult} from '@hello-pangea/dnd';
+import UnfoldLessOutlinedIcon from '@mui/icons-material/UnfoldLessOutlined';
+import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 
 interface Props {
     groupId: number
@@ -27,6 +29,7 @@ interface Props {
 }
 
 export const GroupTopicsDisplay: FC<Props> = (props) => {
+    const [isMinimized, setIsMinimized] = useState<boolean>(false)
     const [isNewTopicAdderOpen, setIsNewTopicAdderOpen] = useState<boolean>(false)
     const [shouldShowArchiveTopics, setShouldShowArchiveTopics] = useState<boolean>(false)
     const [isGroupRenamerOpen, setIsGroupRenamerOpen] = useState<boolean>(false)
@@ -116,19 +119,26 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
     return (
         <>
             <UsedEndpointSuspense usedEndpoint={usedGroup} pendingNode={<Stack><CircularProgress/></Stack>} failedNode={'Error loading group name :/'}>
-                <Stack direction="row">
-                    <Typography variant="h4" marginBottom={1}>
-                        {usedGroup.data?.name}
-                    </Typography>
+                <Stack display="flex" direction="row" justifyContent="space-between">
 
-
-                    <Stack>
+                    <Stack direction="row">
+                        <Typography variant="h4" marginBottom={1}>
+                            {usedGroup.data?.name}
+                        </Typography>
                         <Tooltip title="Click for More">
                             <IconButton onClick={e => setMoreMenuAnchorElement(e.currentTarget)}>
                                 <MoreHorizOutlinedIcon/>
                             </IconButton>
                         </Tooltip>
                     </Stack>
+
+                    <Box>
+                        <Tooltip title={isMinimized ? "Expand Group" : "Collapse Group"}>
+                            <IconButton color="secondary" onClick={() => setIsMinimized(prev => !prev)}>
+                                {isMinimized ? <UnfoldMoreOutlinedIcon/> : <UnfoldLessOutlinedIcon/>}
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
 
 
                     <Menu
@@ -207,135 +217,138 @@ export const GroupTopicsDisplay: FC<Props> = (props) => {
                 </Tooltip>
             )}
 
-            {usedNonArchiveTopics.pending && <p>Loading topics...</p>}
-            {(usedAllTopics.failed || usedNonArchiveTopics.failed) && <p>Failed to load topics :/ <button onClick={() => reloadTopics()}>Retry</button></p>}
-            <Stack spacing={2}>
+            <div style={{display: isMinimized ? "none" : "block"}}>
 
-                <DragDropContext onDragEnd={onDragEnd}>
-                    <Droppable droppableId="nonArchiveTopicsList">
-                        {(droppableProvided) => (
-                            <Stack spacing={2} ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
-                                {topicsToDisplay
-                                    ?.map((topic, index) => (
-                                        <Draggable key={topic.id} draggableId={topic.id.toString()} index={index}>
-                                            {(draggableProvided) => {
-                                                const isTopicDisplayed = (props.showPrivateTopics || !topic.isPrivate) && !topic.isArchive
-                                                if (!isTopicDisplayed) {
-                                                    return <div
-                                                        ref={draggableProvided.innerRef}
-                                                        key={topic.id}
-                                                        {...draggableProvided.draggableProps}
-                                                        {...draggableProvided.dragHandleProps}
-                                                        style={{display: 'none'}}
-                                                    />
-                                                }
+                {usedNonArchiveTopics.pending && <p>Loading topics...</p>}
+                {(usedAllTopics.failed || usedNonArchiveTopics.failed) && <p>Failed to load topics :/ <button onClick={() => reloadTopics()}>Retry</button></p>}
+                <Stack spacing={2}>
 
-                                                return (
-                                                    <Topic
-                                                        draggableProvided={draggableProvided}
-                                                        key={topic.id}
-                                                        initialTopic={topic}
-                                                        afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
-                                                            if (wasDeletionSurelySuccessful) {
-                                                                setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
-                                                            } else {
-                                                                reloadTopics()
-                                                            }
-                                                        }}
-                                                        afterSetIsArchiveStateAttempt={(wasSurelySuccessful, newIsArchive) => {
-                                                            if (wasSurelySuccessful) {
-                                                                setTopicsToDisplay(prevState => prevState?.map(it => {
-                                                                    if (it.id === topic.id) {
-                                                                        return {
-                                                                            ...it,
-                                                                            isArchive: newIsArchive,
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <Droppable droppableId="nonArchiveTopicsList">
+                            {(droppableProvided) => (
+                                <Stack spacing={2} ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
+                                    {topicsToDisplay
+                                        ?.map((topic, index) => (
+                                            <Draggable key={topic.id} draggableId={topic.id.toString()} index={index}>
+                                                {(draggableProvided) => {
+                                                    const isTopicDisplayed = (props.showPrivateTopics || !topic.isPrivate) && !topic.isArchive
+                                                    if (!isTopicDisplayed) {
+                                                        return <div
+                                                            ref={draggableProvided.innerRef}
+                                                            key={topic.id}
+                                                            {...draggableProvided.draggableProps}
+                                                            {...draggableProvided.dragHandleProps}
+                                                            style={{display: 'none'}}
+                                                        />
+                                                    }
+
+                                                    return (
+                                                        <Topic
+                                                            draggableProvided={draggableProvided}
+                                                            key={topic.id}
+                                                            initialTopic={topic}
+                                                            afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
+                                                                if (wasDeletionSurelySuccessful) {
+                                                                    setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
+                                                                } else {
+                                                                    reloadTopics()
+                                                                }
+                                                            }}
+                                                            afterSetIsArchiveStateAttempt={(wasSurelySuccessful, newIsArchive) => {
+                                                                if (wasSurelySuccessful) {
+                                                                    setTopicsToDisplay(prevState => prevState?.map(it => {
+                                                                        if (it.id === topic.id) {
+                                                                            return {
+                                                                                ...it,
+                                                                                isArchive: newIsArchive,
+                                                                            }
                                                                         }
-                                                                    }
-                                                                    return it
-                                                                }) || null)
-                                                            } else {
-                                                                reloadTopics()
-                                                            }
-                                                        }}
-                                                    />
-                                                )
-                                            }}
-                                        </Draggable>
-                                    ))}
-                                {droppableProvided.placeholder}
-                            </Stack>
-                        )}
-                    </Droppable>
-                </DragDropContext>
+                                                                        return it
+                                                                    }) || null)
+                                                                } else {
+                                                                    reloadTopics()
+                                                                }
+                                                            }}
+                                                        />
+                                                    )
+                                                }}
+                                            </Draggable>
+                                        ))}
+                                    {droppableProvided.placeholder}
+                                </Stack>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
 
-                {!isNewTopicAdderOpen && (
+                    {!isNewTopicAdderOpen && (
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() => setIsNewTopicAdderOpen(true)}
+                            startIcon={<AddOutlinedIcon/>}>
+                            Add new topic
+                        </Button>
+                    )}
+                    {isNewTopicAdderOpen && (
+                        <NewTopicAdder groupId={props.groupId} afterNewTopicSaved={() => {
+                            reloadTopics()
+                            setIsNewTopicAdderOpen(false)
+                        }}/>
+                    )}
+                </Stack>
+
+                <Stack marginTop={2}>
                     <Button
                         variant="outlined"
-                        color="primary"
-                        onClick={() => setIsNewTopicAdderOpen(true)}
-                        startIcon={<AddOutlinedIcon/>}>
-                        Add new topic
+                        color="secondary"
+                        onClick={() => setShouldShowArchiveTopics(prevState => !prevState)}
+                        fullWidth
+                        startIcon={shouldShowArchiveTopics ? <KeyboardDoubleArrowUpOutlinedIcon/> : <KeyboardDoubleArrowDownOutlinedIcon/>}
+                        endIcon={shouldShowArchiveTopics ? <KeyboardDoubleArrowUpOutlinedIcon/> : <KeyboardDoubleArrowDownOutlinedIcon/>}
+                    >
+                        {shouldShowArchiveTopics ? 'Hide' : 'Show'} archive topics
                     </Button>
-                )}
-                {isNewTopicAdderOpen && (
-                    <NewTopicAdder groupId={props.groupId} afterNewTopicSaved={() => {
-                        reloadTopics()
-                        setIsNewTopicAdderOpen(false)
-                    }}/>
-                )}
-            </Stack>
-
-            <Stack marginTop={2}>
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => setShouldShowArchiveTopics(prevState => !prevState)}
-                    fullWidth
-                    startIcon={shouldShowArchiveTopics ? <KeyboardDoubleArrowUpOutlinedIcon/> : <KeyboardDoubleArrowDownOutlinedIcon/>}
-                    endIcon={shouldShowArchiveTopics ? <KeyboardDoubleArrowUpOutlinedIcon/> : <KeyboardDoubleArrowDownOutlinedIcon/>}
-                >
-                    {shouldShowArchiveTopics ? 'Hide' : 'Show'} archive topics
-                </Button>
 
 
-                {shouldShowArchiveTopics && (
-                    <UsedEndpointSuspense usedEndpoint={usedAllTopics}>
-                        <Stack spacing={2}>
-                            {topicsToDisplay
-                                ?.filter(it => props.showPrivateTopics || !it.isPrivate)
-                                ?.filter(it => it.isArchive)
-                                ?.map(topic => (
-                                    <Topic
-                                        key={topic.id}
-                                        initialTopic={topic}
-                                        afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
-                                            if (wasDeletionSurelySuccessful) {
-                                                setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
-                                            } else {
-                                                reloadTopics()
-                                            }
-                                        }}
-                                        afterSetIsArchiveStateAttempt={(wasSurelySuccessful, newIsArchive) => {
-                                            if (wasSurelySuccessful) {
-                                                setTopicsToDisplay(prevState => prevState?.map(it => {
-                                                    if (it.id === topic.id) {
-                                                        return {
-                                                            ...it,
-                                                            isArchive: newIsArchive,
+                    {shouldShowArchiveTopics && (
+                        <UsedEndpointSuspense usedEndpoint={usedAllTopics}>
+                            <Stack spacing={2}>
+                                {topicsToDisplay
+                                    ?.filter(it => props.showPrivateTopics || !it.isPrivate)
+                                    ?.filter(it => it.isArchive)
+                                    ?.map(topic => (
+                                        <Topic
+                                            key={topic.id}
+                                            initialTopic={topic}
+                                            afterTopicDeletionAttempt={(wasDeletionSurelySuccessful) => {
+                                                if (wasDeletionSurelySuccessful) {
+                                                    setTopicsToDisplay(prevState => prevState?.filter(it => it.id !== topic.id) ?? null)
+                                                } else {
+                                                    reloadTopics()
+                                                }
+                                            }}
+                                            afterSetIsArchiveStateAttempt={(wasSurelySuccessful, newIsArchive) => {
+                                                if (wasSurelySuccessful) {
+                                                    setTopicsToDisplay(prevState => prevState?.map(it => {
+                                                        if (it.id === topic.id) {
+                                                            return {
+                                                                ...it,
+                                                                isArchive: newIsArchive,
+                                                            }
                                                         }
-                                                    }
-                                                    return it
-                                                }) || null)
-                                            } else {
-                                                reloadTopics()
-                                            }
-                                        }}
-                                    />
-                                ))}
-                        </Stack>
-                    </UsedEndpointSuspense>
-                )}
-            </Stack>
+                                                        return it
+                                                    }) || null)
+                                                } else {
+                                                    reloadTopics()
+                                                }
+                                            }}
+                                        />
+                                    ))}
+                            </Stack>
+                        </UsedEndpointSuspense>
+                    )}
+                </Stack>
+            </div>
         </>
     )
 }
